@@ -1,0 +1,32 @@
+name: Label Synchronization
+
+on:
+  schedule:
+    # Run at 09:00 UTC every Monday (1 hour after Policy Check)
+    - cron: '0 9 * * 1'
+  workflow_dispatch:
+
+jobs:
+  label-sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install pyyaml
+
+      - name: Sync Labels
+        env:
+          GITHUB_TOKEN: ${{ secrets.POLICY_PAT }}
+        run: |
+          if [ -z "${GITHUB_TOKEN}" ]; then
+            echo "::error::POLICY_PAT secret is missing! Workflow cannot access other repos."
+            exit 1
+          fi
+          python3 scripts/sync_labels.py
