@@ -1,10 +1,12 @@
 # ---------------------------------------------------------------------------
-# Repo map for the GENERAL (non-nix-workspace) kleinbem repos.
+# Single source of truth for ALL owned kleinbem repos' GitHub config (settings,
+# rulesets, labels, security). This repo is PRIVATE, so it safely declares
+# private repos too.
 #
-# Domain split: this repo (github-config) owns account-wide/general repos; the
-# nix meta-workspace's terraform/ owns the 8 nix-* workspace repos + their
-# Actions secrets. Forks and the throwaway `test` repo are intentionally
-# excluded. Empty repos get no ruleset (no default branch to protect yet).
+# Split of responsibility: this repo owns repo *config*; the nix meta-workspace's
+# terraform/ owns only the Actions *secret* distribution for its CI repos (those
+# values come from sops and must run where sops is). Forks and the throwaway
+# `test` repo are excluded. Empty repos get no ruleset (no default branch yet).
 #
 # Settings normalise to best practice; `description`/`visibility` mirror current
 # GitHub state so the first apply only normalises and never clears/flips.
@@ -44,6 +46,16 @@ locals {
     "openwrt-config"                = { description = "Managing OpenWRT network", ruleset = false } # empty repo
     "openwrt-secrets"               = { description = "", visibility = "private", ruleset = false } # empty repo
     "rename-window-gnome-extension" = { description = "" }
+
+    # nix meta-workspace repos (config here; their Actions secrets live in nix/terraform).
+    "nix"           = { description = "nix workspace" }
+    "nix-config"    = { description = "nix-config" }
+    "nix-packages"  = { description = "Nix User Repository (NUR)" }
+    "nix-devshells" = { description = "Isolated dev environments" }
+    "nix-presets"   = { description = "Reusable NixOS modules, hardened security policies, and Nixpak sandboxes." }
+    "nix-hardware"  = { description = "A library of NixOS hardware modules." }
+    "nix-templates" = { description = "Reproducible development environments and Flake templates for instant project bootstrapping." }
+    "nix-secrets"   = { description = "Encrypted secrets for declarative NixOS configuration", visibility = "private" }
   }
 
   repos = {
@@ -65,14 +77,4 @@ locals {
     "dependencies"     = { color = "0366d6", description = "Pull requests that update a dependency" }
   }
 
-  repo_label_pairs = merge([
-    for name, _ in local.repos : {
-      for lname, l in local.standard_labels : "${name}/${lname}" => {
-        repo  = name
-        name  = lname
-        color = l.color
-        desc  = l.description
-      }
-    }
-  ]...)
 }

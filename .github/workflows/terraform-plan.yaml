@@ -1,8 +1,9 @@
 name: Terraform Plan (drift detection)
 
-# Runs `tofu plan` to detect drift between the declared GitHub config and
-# reality (e.g. a setting changed in the UI behind Terraform's back). Read-only
-# — it never applies; apply stays a local, human-reviewed step (`just apply`).
+# Runs `tofu plan` against the shared R2 state to detect drift between the
+# declared GitHub config and reality (e.g. a setting changed in the UI). Shared
+# state means the signal is exact — `-detailed-exitcode` is 0 (no drift) or
+# 2 (drift). Read-only: never applies (apply is local via `just apply`).
 
 on:
   schedule:
@@ -18,28 +19,32 @@ jobs:
   plan:
     runs-on: ubuntu-latest
     env:
-      # Fine-grained PAT with Administration:read + Metadata:read on the managed
-      # repos (read-only is enough to refresh + plan).
+      # Provider auth (Administration:read + Metadata:read on all managed repos).
       TF_VAR_github_tf_token: ${{ secrets.TF_GITHUB_TOKEN }}
+      # R2 remote-state backend.
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
     steps:
       - uses: actions/checkout@v4
       - uses: opentofu/setup-opentofu@v1
 
-      - name: tofu init
-        run: tofu init -input=false
+      - name: tofu init (R2 backend)
+        run: |
+          printf 'endpoints = { s3 = "https://%s.r2.cloudflarestorage.com" }\n' \
+            "$CLOUDFLARE_ACCOUNT_ID" > .r2-endpoint.hcl
+          tofu init -input=false -backend-config=.r2-endpoint.hcl
 
       - name: tofu plan
-        id: plan
         run: |
-          set -o pipefail
-          tofu plan -input=false -lock=false -no-color -detailed-exitcode 2>&1 | tee plan.txt || ec=$?
-          # -detailed-exitcode: 0 = no changes, 2 = drift, 1 = error.
-          echo "exit=${ec:-0}" >> "$GITHUB_OUTPUT"
+          tofu plan -input=false -no-color -detailed-exitcode 2>&1 | tee plan.txt || ec=$?
           {
-            echo "## tofu plan"
-            if [ "${ec:-0}" = "2" ]; then echo "⚠️ **Drift detected** — declared config differs from GitHub."; fi
-            echo '```'
-            tail -c 60000 plan.txt
-            echo '```'
+            echo "## tofu plan — github-config"
+            case "${ec:-0}" in
+              0) echo "✅ No drift — GitHub matches the declared config." ;;
+              2) echo "⚠️ **Drift detected** — see the \`~\`/\`-\`/\`+\` lines below." ;;
+              *) echo "❌ Plan errored." ;;
+            esac
+            echo '```'; tail -c 60000 plan.txt; echo '```'
           } >> "$GITHUB_STEP_SUMMARY"
           [ "${ec:-0}" = "1" ] && exit 1 || exit 0

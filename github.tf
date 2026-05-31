@@ -94,14 +94,18 @@ resource "github_repository_ruleset" "main" {
   depends_on = [github_repository.this]
 }
 
-# Standard label set, synced to every managed repo.
-resource "github_issue_label" "std" {
-  for_each = local.repo_label_pairs
+# Standard label set, authoritative per repo (handles GitHub's default labels
+# without per-label imports; reconciles to exactly this set).
+resource "github_issue_labels" "this" {
+  for_each   = local.repos
+  repository = github_repository.this[each.key].name
 
-  repository  = each.value.repo
-  name        = each.value.name
-  color       = each.value.color
-  description = each.value.desc
-
-  depends_on = [github_repository.this]
+  dynamic "label" {
+    for_each = local.standard_labels
+    content {
+      name        = label.key
+      color       = label.value.color
+      description = label.value.description
+    }
+  }
 }

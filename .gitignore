@@ -1,8 +1,9 @@
-# Terraform / OpenTofu — state may contain sensitive values; keep it local.
+# Terraform / OpenTofu — state lives in R2 now, but keep local artifacts out.
 .terraform/
 *.tfstate
 *.tfstate.*
 .terraform.lock.hcl
+.r2-endpoint.hcl
 crash.log
 
 # Python
