@@ -1,0 +1,39 @@
+name: Governance Report
+
+# Weekly read-only governance pass: regenerate DASHBOARD.md and append traffic
+# stats, then commit. Enforcement (settings/rulesets/labels) is NOT here — that
+# is declarative Terraform, applied locally.
+
+on:
+  schedule:
+    - cron: '0 8 * * 1' # Mondays 08:00 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  report:
+    runs-on: ubuntu-latest
+    env:
+      # Fine-grained PAT with read access (Metadata + Contents) to all repos —
+      # the built-in GITHUB_TOKEN only sees this repo.
+      GH_TOKEN: ${{ secrets.GOVERNANCE_PAT }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Generate dashboard + traffic
+        run: |
+          python3 scripts/govern.py report
+          python3 scripts/govern.py traffic
+
+      - name: Commit changes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add DASHBOARD.md governance-report.json traffic_data/
+          git diff --cached --quiet || git commit -m "chore: governance report $(date -u +%Y-%m-%d)"
+          git push

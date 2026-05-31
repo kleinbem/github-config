@@ -1,0 +1,10 @@
+# Terraform / OpenTofu — state may contain sensitive values; keep it local.
+.terraform/
+*.tfstate
+*.tfstate.*
+.terraform.lock.hcl
+crash.log
+
+# Python
+__pycache__/
+*.pyc
