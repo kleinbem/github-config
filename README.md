@@ -34,15 +34,15 @@ config) so CI drift detection is exact.
    ```
 4. `nix develop` then `just migrate-state` (moves existing local state into R2).
 
-### Day-to-day
-```bash
-just plan    # REVIEW: imports + in-place updates, zero destroy/create
-just apply
-```
+### Day-to-day (GitOps)
+We use a full **Enterprise GitOps** pipeline to manage infrastructure safely:
 
-The provider token comes from `gh auth token` (or a fine-grained PAT) and needs
-Administration R/W (settings + rulesets), Issues R/W (labels), Metadata R across
-the managed repos.
+1. **Plan:** Open a Pull Request. GitHub Actions will automatically run `tofu plan` and comment the exact drift detection results on the PR.
+2. **Apply:** Once approved, merge the PR into `main`. GitHub Actions will seamlessly authenticate and run `tofu apply -auto-approve` in the cloud.
+
+You no longer need to execute `just apply` locally!
+
+*(Note: The `TF_GITHUB_TOKEN` secret in GitHub Actions requires a fine-grained PAT with Administration Read/Write and Issues Read/Write to properly apply rulesets and labels.)*
 
 ## Observability (`govern.py`)
 

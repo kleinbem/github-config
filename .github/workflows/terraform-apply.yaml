@@ -1,0 +1,41 @@
+name: Terraform Apply (GitOps deploy)
+
+# Runs `tofu apply -auto-approve` against the shared R2 state when changes are
+# pushed or merged to the default branch. This strictly enforces the GitOps
+# deployment model: PRs are used to preview the plan, and merges apply it.
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - '**.tf'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    env:
+      # Provider auth (Administration:write + Metadata:read on all managed repos).
+      # NOTE: This token must be a fine-grained PAT with R/W permissions!
+      TF_VAR_github_tf_token: ${{ secrets.TF_GITHUB_TOKEN }}
+      # R2 remote-state backend.
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: opentofu/setup-opentofu@v1
+
+      - name: tofu init (R2 backend)
+        run: |
+          printf 'endpoints = { s3 = "https://%s.r2.cloudflarestorage.com" }\n' \
+            "$CLOUDFLARE_ACCOUNT_ID" > .r2-endpoint.hcl
+          tofu init -input=false -backend-config=.r2-endpoint.hcl
+
+      - name: tofu apply
+        run: |
+          tofu apply -auto-approve -input=false
