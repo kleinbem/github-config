@@ -20,8 +20,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       # Provider auth (Administration:write + Metadata:read on all managed repos).
-      # NOTE: This token must be a fine-grained PAT with R/W permissions!
-      TF_VAR_github_tf_token: ${{ secrets.TF_GITHUB_TOKEN }}
+      # TF_VAR_github_tf_token is generated dynamically via GitHub App.
       # R2 remote-state backend.
       CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
       AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
@@ -29,6 +28,17 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: opentofu/setup-opentofu@v1
+
+      - name: Generate GitHub App Token
+        id: app-token
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ secrets.APP_ID }}
+          private-key: ${{ secrets.APP_PRIVATE_KEY }}
+          owner: ${{ github.repository_owner }}
+
+      - name: Set TF_VAR_github_tf_token
+        run: echo "TF_VAR_github_tf_token=${{ steps.app-token.outputs.token }}" >> $GITHUB_ENV
 
       - name: tofu init (R2 backend)
         run: |

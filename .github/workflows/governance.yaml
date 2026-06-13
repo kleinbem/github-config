@@ -16,14 +16,23 @@ jobs:
   report:
     runs-on: ubuntu-latest
     env:
-      # Fine-grained PAT with read access (Metadata + Contents) to all repos —
-      # the built-in GITHUB_TOKEN only sees this repo.
-      GH_TOKEN: ${{ secrets.GOVERNANCE_PAT }}
+      # GH_TOKEN is generated dynamically via GitHub App.
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
+
+      - name: Generate GitHub App Token
+        id: app-token
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ secrets.APP_ID }}
+          private-key: ${{ secrets.APP_PRIVATE_KEY }}
+          owner: ${{ github.repository_owner }}
+
+      - name: Set GH_TOKEN
+        run: echo "GH_TOKEN=${{ steps.app-token.outputs.token }}" >> $GITHUB_ENV
 
       - name: Generate dashboard + traffic
         run: |
