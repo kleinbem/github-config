@@ -83,6 +83,19 @@ resource "github_repository_ruleset" "main" {
     deletion                = true
     non_fast_forward        = true
     required_linear_history = true
+
+    dynamic "required_status_checks" {
+      for_each = length(each.value.required_checks) > 0 ? [1] : []
+      content {
+        strict_required_status_checks_policy = true
+        dynamic "required_check" {
+          for_each = each.value.required_checks
+          content {
+            context = required_check.value
+          }
+        }
+      }
+    }
   }
 
   bypass_actors {

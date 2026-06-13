@@ -28,6 +28,7 @@ locals {
     squash_merge_message   = "PR_BODY"
     vulnerability_alerts   = true
     ruleset                = true
+    required_checks        = []
   }
 
   repo_overrides = {
@@ -48,7 +49,7 @@ locals {
     "rename-window-gnome-extension" = { description = "" }
 
     # nix meta-workspace repos (config here; their Actions secrets live in nix/terraform).
-    "nix"           = { description = "nix workspace" }
+    "nix"           = { description = "nix workspace", required_checks = ["System Integration & VM Tests", "Lint & Format Audit"] }
     "nix-config"    = { description = "nix-config" }
     "nix-packages"  = { description = "Nix User Repository (NUR)" }
     "nix-devshells" = { description = "Isolated dev environments" }
