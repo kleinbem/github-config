@@ -35,6 +35,15 @@ resource "github_repository" "this" {
 
   vulnerability_alerts = each.value.vulnerability_alerts
 
+  # DCO-style sign-off required for any commits made via the GitHub web UI.
+  # Has no effect on git-pushed commits — those are governed by the ruleset
+  # below (required_signatures).
+  web_commit_signoff_required = each.value.web_commit_signoff_required
+
+  # Portfolio discoverability — topics make public repos surface in GitHub
+  # search + tag-based browsing. Empty list = no topics.
+  topics = each.value.topics
+
   # Secret scanning + push protection are free on public repos; private repos
   # need GitHub Advanced Security, so only enable on public ones.
   dynamic "security_and_analysis" {
@@ -83,6 +92,10 @@ resource "github_repository_ruleset" "main" {
     deletion                = true
     non_fast_forward        = true
     required_linear_history = true
+    # Require GPG/SSH signature on every commit landing on the default branch.
+    # Paired with jj's `signing.behavior = "own"` + the V2 SSH-FIDO NoTouch key,
+    # this is touchless. See nix-presets/git.nix for the jj-side config.
+    required_signatures = true
 
     dynamic "required_status_checks" {
       for_each = length(each.value.required_checks) > 0 ? [1] : []
@@ -103,6 +116,21 @@ resource "github_repository_ruleset" "main" {
     actor_type  = "RepositoryRole"
     bypass_mode = "always"
   }
+
+  # TODO(bot bypass): if you want lockfile-autopilot's GitHub App or other
+  # automations to push directly without going through PR review, add an
+  # `Integration` bypass actor here. Dependabot commits are GitHub-signed by
+  # default and will pass `required_signatures` without bypass; this is only
+  # needed for bots whose pushes don't carry verified signatures.
+  #
+  # Example:
+  #   bypass_actors {
+  #     actor_id    = data.github_app.lockfile_autopilot.installation_id
+  #     actor_type  = "Integration"
+  #     bypass_mode = "always"
+  #   }
+  #
+  # Find the ID via: `gh api /repos/kleinbem/<repo>/installation`
 
   depends_on = [github_repository.this]
 }

@@ -14,21 +14,23 @@
 
 locals {
   repo_defaults = {
-    visibility             = "public"
-    has_issues             = true
-    has_wiki               = false
-    has_projects           = false
-    allow_squash_merge     = true
-    allow_merge_commit     = false
-    allow_rebase_merge     = false
-    allow_auto_merge       = true
-    allow_update_branch    = true
-    delete_branch_on_merge = true
-    squash_merge_title     = "PR_TITLE"
-    squash_merge_message   = "PR_BODY"
-    vulnerability_alerts   = true
-    ruleset                = true
-    required_checks        = []
+    visibility                  = "public"
+    has_issues                  = true
+    has_wiki                    = false
+    has_projects                = false
+    allow_squash_merge          = true
+    allow_merge_commit          = false
+    allow_rebase_merge          = false
+    allow_auto_merge            = true
+    allow_update_branch         = true
+    delete_branch_on_merge      = true
+    squash_merge_title          = "PR_TITLE"
+    squash_merge_message        = "PR_BODY"
+    vulnerability_alerts        = true
+    web_commit_signoff_required = true # DCO sign-off for any web-UI commits
+    ruleset                     = true
+    required_checks             = []
+    topics                      = [] # per-repo overrides via repo_overrides
   }
 
   repo_overrides = {
@@ -49,14 +51,37 @@ locals {
     "rename-window-gnome-extension" = { description = "" }
 
     # nix meta-workspace repos (config here; their Actions secrets live in nix/terraform).
-    "nix"           = { description = "nix workspace", required_checks = ["System Integration & VM Tests", "Lint & Format Audit"] }
-    "nix-config"    = { description = "nix-config" }
-    "nix-packages"  = { description = "Nix User Repository (NUR)" }
-    "nix-devshells" = { description = "Isolated dev environments" }
-    "nix-presets"   = { description = "Reusable NixOS modules, hardened security policies, and Nixpak sandboxes." }
-    "nix-hardware"  = { description = "A library of NixOS hardware modules." }
-    "nix-templates" = { description = "Reproducible development environments and Flake templates for instant project bootstrapping." }
-    "nix-secrets"   = { description = "Encrypted secrets for declarative NixOS configuration", visibility = "private" }
+    # Public ones get portfolio topics so they surface in GitHub search/discovery.
+    "nix" = {
+      description     = "nix workspace"
+      required_checks = ["System Integration & VM Tests", "Lint & Format Audit"]
+      topics          = ["nixos", "nix-flakes", "infrastructure-as-code", "homelab", "monorepo", "jujutsu"]
+    }
+    "nix-config" = {
+      description = "nix-config"
+      topics      = ["nixos", "nix-flakes", "homelab", "home-manager", "nixos-config"]
+    }
+    "nix-packages" = {
+      description = "Nix User Repository (NUR)"
+      topics      = ["nixos", "nix-flakes", "nur"]
+    }
+    "nix-devshells" = {
+      description = "Isolated dev environments"
+      topics      = ["nixos", "nix-flakes", "devenv", "dev-shells"]
+    }
+    "nix-presets" = {
+      description = "Reusable NixOS modules, hardened security policies, and Nixpak sandboxes."
+      topics      = ["nixos", "nix-flakes", "nixos-modules", "containers", "nixpak"]
+    }
+    "nix-hardware" = {
+      description = "A library of NixOS hardware modules."
+      topics      = ["nixos", "nix-flakes", "nixos-modules", "hardware"]
+    }
+    "nix-templates" = {
+      description = "Reproducible development environments and Flake templates for instant project bootstrapping."
+      topics      = ["nixos", "nix-flakes", "templates", "scaffolding"]
+    }
+    "nix-secrets" = { description = "Encrypted secrets for declarative NixOS configuration", visibility = "private" }
   }
 
   repos = {
