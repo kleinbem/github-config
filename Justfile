@@ -76,20 +76,20 @@ traffic:
 
 # Meta workspace jj operation forwarders:
 status-all:
-    @just -f ../nix/justfile jj::status-all
+    @if [ -f ../justfile ]; then just -f ../justfile jj::status-all; else jj status; fi
 
 save-all message="":
-    @just -f ../nix/justfile jj::save-all "{{message}}"
+    @if [ -f ../justfile ]; then just -f ../justfile jj::save-all "{{message}}"; else jj describe -m "{{message}}"; fi
 
 diff-all *args="":
-    @just -f ../nix/justfile jj::diff-all {{args}}
+    @if [ -f ../justfile ]; then just -f ../justfile jj::diff-all {{args}}; else jj diff {{args}}; fi
 
 pull-all:
-    @just -f ../nix/justfile jj::pull-all
+    @if [ -f ../justfile ]; then just -f ../justfile jj::pull-all; else jj git fetch && jj rebase -d main@origin; fi
 
 push-all:
-    @just -f ../nix/justfile jj::push-all
+    @if [ -f ../justfile ]; then just -f ../justfile jj::push-all; else jj git push; fi
 
 # Describe, sign, and push across the workspace using the meta jj::ship workflow.
 ship message="":
-    @just -f ../nix/justfile jj::ship "{{message}}"
+    @if [ -f ../justfile ]; then just -f ../justfile jj::ship "{{message}}"; else git commit -a -m "{{message}}" && git push origin main; fi
