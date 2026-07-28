@@ -1,29 +1,68 @@
 default:
     @just --list
 
-# --- Enforcement (declarative, Terraform; state in Cloudflare R2) ----------
+# --- Enforcement (declarative, OpenTofu; state in Cloudflare R2) ----------
 
-# Init the R2 backend. Requires env:
-#   CLOUDFLARE_ACCOUNT_ID         — for the R2 S3 endpoint
-#   AWS_ACCESS_KEY_ID / AWS_SECRET_ACCESS_KEY — an R2 access key (token)
+# Init the R2 backend. Decrypts sops automatically if env vars are missing.
 init:
-    @test -n "${CLOUDFLARE_ACCOUNT_ID:-}" || { echo "set CLOUDFLARE_ACCOUNT_ID"; exit 1; }
-    @printf 'endpoints = { s3 = "https://%s.r2.cloudflarestorage.com" }\n' "$CLOUDFLARE_ACCOUNT_ID" > .r2-endpoint.hcl
-    tofu init -input=false -backend-config=.r2-endpoint.hcl
+    #!/usr/bin/env bash
+    set -euo pipefail
+    TOFU=$(command -v tofu 2>/dev/null || echo "nix develop --command tofu")
+    SECRETS="../nix/nix-secrets/secrets.yaml"
+    if [ -z "${CLOUDFLARE_ACCOUNT_ID:-}" ] && [ -f "$SECRETS" ]; then
+        echo "🔐 Decrypting R2 credentials from nix-secrets (touch YubiKey if prompted)..." >&2
+        if YAML=$(sops -d "$SECRETS"); then
+            ACCOUNT_ID=$(echo "$YAML" | yq '.cloudflare_account_id')
+            KEY_ID=$(echo "$YAML" | yq '.r2_state_access_key_id')
+            SECRET_KEY=$(echo "$YAML" | yq '.r2_state_secret_access_key')
+            if [ -n "$ACCOUNT_ID" ] && [ "$ACCOUNT_ID" != "null" ]; then
+                export CLOUDFLARE_ACCOUNT_ID="$ACCOUNT_ID"
+                export AWS_ACCESS_KEY_ID="$KEY_ID"
+                export AWS_SECRET_ACCESS_KEY="$SECRET_KEY"
+            fi
+        fi
+    fi
+    if [ -z "${CLOUDFLARE_ACCOUNT_ID:-}" ] || [ "${CLOUDFLARE_ACCOUNT_ID:-}" = "null" ]; then
+        echo "❌ CLOUDFLARE_ACCOUNT_ID missing. Ensure nix-secrets is available or export CLOUDFLARE_ACCOUNT_ID." >&2
+        exit 1
+    fi
+    printf 'endpoints = { s3 = "https://%s.r2.cloudflarestorage.com" }\n' "$CLOUDFLARE_ACCOUNT_ID" > .r2-endpoint.hcl
+    $TOFU init -input=false -backend-config=.r2-endpoint.hcl
 
 # Review planned GitHub config changes (imports + in-place updates only).
 plan: init
-    TF_VAR_github_tf_token="$(gh auth token)" tofu plan
+    #!/usr/bin/env bash
+    set -euo pipefail
+    TOFU=$(command -v tofu 2>/dev/null || echo "nix develop --command tofu")
+    SECRETS="../nix/nix-secrets/secrets.yaml"
+    if [ -z "${AWS_ACCESS_KEY_ID:-}" ] && [ -f "$SECRETS" ]; then
+        if YAML=$(sops -d "$SECRETS"); then
+            export AWS_ACCESS_KEY_ID=$(echo "$YAML" | yq '.r2_state_access_key_id')
+            export AWS_SECRET_ACCESS_KEY=$(echo "$YAML" | yq '.r2_state_secret_access_key')
+        fi
+    fi
+    TF_VAR_github_tf_token="$(gh auth token)" $TOFU plan
 
 # Apply the GitHub config (settings, rulesets, labels).
 apply: init
-    TF_VAR_github_tf_token="$(gh auth token)" tofu apply
+    #!/usr/bin/env bash
+    set -euo pipefail
+    TOFU=$(command -v tofu 2>/dev/null || echo "nix develop --command tofu")
+    SECRETS="../nix/nix-secrets/secrets.yaml"
+    if [ -z "${AWS_ACCESS_KEY_ID:-}" ] && [ -f "$SECRETS" ]; then
+        if YAML=$(sops -d "$SECRETS"); then
+            export AWS_ACCESS_KEY_ID=$(echo "$YAML" | yq '.r2_state_access_key_id')
+            export AWS_SECRET_ACCESS_KEY=$(echo "$YAML" | yq '.r2_state_secret_access_key')
+        fi
+    fi
+    TF_VAR_github_tf_token="$(gh auth token)" $TOFU apply
 
 # One-time: migrate the existing local state into R2.
-migrate-state:
-    @test -n "${CLOUDFLARE_ACCOUNT_ID:-}" || { echo "set CLOUDFLARE_ACCOUNT_ID"; exit 1; }
-    @printf 'endpoints = { s3 = "https://%s.r2.cloudflarestorage.com" }\n' "$CLOUDFLARE_ACCOUNT_ID" > .r2-endpoint.hcl
-    tofu init -migrate-state -backend-config=.r2-endpoint.hcl
+migrate-state: init
+    #!/usr/bin/env bash
+    set -euo pipefail
+    TOFU=$(command -v tofu 2>/dev/null || echo "nix develop --command tofu")
+    $TOFU init -migrate-state -backend-config=.r2-endpoint.hcl
 
 # --- Observability (read-only reporting) -----------------------------------
 
@@ -34,3 +73,23 @@ report:
 # Append today's traffic stats to traffic_data/.
 traffic:
     python3 scripts/govern.py traffic
+
+# Meta workspace jj operation forwarders:
+status-all:
+    @just -f ../nix/justfile jj::status-all
+
+save-all message="":
+    @just -f ../nix/justfile jj::save-all "{{message}}"
+
+diff-all *args="":
+    @just -f ../nix/justfile jj::diff-all {{args}}
+
+pull-all:
+    @just -f ../nix/justfile jj::pull-all
+
+push-all:
+    @just -f ../nix/justfile jj::push-all
+
+# Describe, sign, and push across the workspace using the meta jj::ship workflow.
+ship message="":
+    @just -f ../nix/justfile jj::ship "{{message}}"

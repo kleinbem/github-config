@@ -30,7 +30,6 @@ locals {
     web_commit_signoff_required = true # DCO sign-off for any web-UI commits
     ruleset                     = true
     required_checks             = []
-    code_scanning               = true
     bypass_apps                 = [] # list of GitHub App installation IDs for ruleset bypass (e.g. lockfile-autopilot)
     topics                      = [] # per-repo overrides via repo_overrides
   }

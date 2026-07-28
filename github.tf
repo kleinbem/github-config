@@ -33,8 +33,6 @@ resource "github_repository" "this" {
   squash_merge_commit_title   = each.value.squash_merge_title
   squash_merge_commit_message = each.value.squash_merge_message
 
-  vulnerability_alerts = each.value.vulnerability_alerts
-
   # DCO-style sign-off required for any commits made via the GitHub web UI.
   # Has no effect on git-pushed commits — those are governed by the ruleset
   # below (required_signatures).
@@ -63,6 +61,13 @@ resource "github_repository" "this" {
   }
 }
 
+# Vulnerability alerts per repository (replaces deprecated in-resource attribute).
+resource "github_repository_vulnerability_alerts" "this" {
+  for_each   = { for k, v in local.repos : k => v if v.vulnerability_alerts }
+  repository = github_repository.this[each.key].name
+  enabled    = true
+}
+
 # Dependabot automated security fixes (free for all repos; needs vuln alerts).
 resource "github_repository_dependabot_security_updates" "this" {
   for_each = local.repos
@@ -72,9 +77,9 @@ resource "github_repository_dependabot_security_updates" "this" {
 }
 
 # Default-branch guardrails: block deletion + force-push, admin (you) bypasses
-# so direct push to the default branch still works. Skipped for empty repos.
+# so direct push to the default branch still works. Rulesets are free for public repos.
 resource "github_repository_ruleset" "main" {
-  for_each = { for n, c in local.repos : n => c if c.ruleset }
+  for_each = { for n, c in local.repos : n => c if c.ruleset && c.visibility == "public" }
 
   name        = "default-branch-guardrails"
   repository  = each.key
@@ -127,13 +132,6 @@ resource "github_repository_ruleset" "main" {
   }
 
   depends_on = [github_repository.this]
-}
-
-# Automated CodeQL code scanning default setup for public repositories.
-resource "github_repository_code_scanning_default_setup" "this" {
-  for_each   = { for k, v in local.repos : k => v if v.visibility == "public" && v.code_scanning && v.ruleset }
-  repository = github_repository.this[each.key].name
-  state      = "configured"
 }
 
 # GitHub Actions permissions policy (authoritative per repo).
