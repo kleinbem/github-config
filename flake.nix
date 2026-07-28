@@ -18,6 +18,8 @@
         pkgs = nixpkgs.legacyPackages.${system};
       in
       {
+        formatter = pkgs.nixfmt-rfc-style;
+
         devShells.default = pkgs.mkShell {
           buildInputs = with pkgs; [
             opentofu
