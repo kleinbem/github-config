@@ -30,24 +30,33 @@ locals {
     web_commit_signoff_required = true # DCO sign-off for any web-UI commits
     ruleset                     = true
     required_checks             = []
+    code_scanning               = true
+    bypass_apps                 = [] # list of GitHub App installation IDs for ruleset bypass (e.g. lockfile-autopilot)
     topics                      = [] # per-repo overrides via repo_overrides
   }
 
   repo_overrides = {
-    "chromeos-vm-kernel"            = { description = "Custom ChromeOS VM kernel" }
-    "CodeReview"                    = { description = "", visibility = "private" }
-    "dotfiles"                      = { description = "dotfiles", visibility = "private" }
-    "evidence"                      = { description = "", visibility = "private" }
-    "geminiapidemo"                 = { description = "", visibility = "private" }
-    "github-config"                 = { description = "Declarative GitHub-as-code: repo settings, rulesets, labels (Terraform) + governance reporting", visibility = "private" }
-    "kleinbem"                      = { description = "It's me!" }
-    "kleinbem-ublue-build"          = { description = "A personal OS image built with BlueBuild, based on bluefin-dx. Contains custom configurations, scripts, and tools for my development workflow." }
-    "kleinbem-ublue"                = { description = "My personal Universal Blue image, based on bluefin-dx. Contains custom configurations, scripts, and tools for my development workflow. " }
-    "nix-redroid-setup"             = { description = "Declarative build system for Redroid OCI images" }
-    "nix-waydroid-setup"            = { description = "Automated Waydroid setup for NixOS" }
+    "chromeos-vm-kernel"   = { description = "Custom ChromeOS VM kernel" }
+    "CodeReview"           = { description = "", visibility = "private" }
+    "dotfiles"             = { description = "dotfiles", visibility = "private" }
+    "evidence"             = { description = "", visibility = "private" }
+    "geminiapidemo"        = { description = "", visibility = "private" }
+    "github-config"        = { description = "Declarative GitHub-as-code: repo settings, rulesets, labels (Terraform) + governance reporting", visibility = "private" }
+    "kleinbem"             = { description = "It's me!" }
+    "kleinbem-ublue-build" = { description = "A personal OS image built with BlueBuild, based on bluefin-dx. Contains custom configurations, scripts, and tools for my development workflow." }
+    "kleinbem-ublue"       = { description = "My personal Universal Blue image, based on bluefin-dx. Contains custom configurations, scripts, and tools for my development workflow. " }
+    "nix-redroid-setup"    = { description = "Declarative build system for Redroid OCI images" }
+    "nix-waydroid-setup"   = { description = "Automated Waydroid setup for NixOS" }
+    # openwrt meta-workspace repos (mirrors the nix meta-workspace layout).
+    # Public as a portfolio piece: secret-relevant values (SSID, passphrase,
+    # lease MACs) live in openwrt-secrets; the public repos hold only structure.
+    "openwrt" = {
+      description = "OpenWrt meta-workspace — tooling orchestrator for router firmware, config, and secrets"
+      topics      = ["openwrt", "ansible", "infrastructure-as-code", "homelab", "monorepo", "jujutsu"]
+    }
     "openwrt-builder"               = { description = "OpenWrt image builder" }
-    "openwrt-config"                = { description = "Managing OpenWRT network", ruleset = false } # empty repo
-    "openwrt-secrets"               = { description = "", visibility = "private", ruleset = false } # empty repo
+    "openwrt-config"                = { description = "Managing OpenWRT network" }
+    "openwrt-secrets"               = { description = "", visibility = "private" }
     "rename-window-gnome-extension" = { description = "" }
 
     # nix meta-workspace repos (config here; their Actions secrets live in nix/terraform).

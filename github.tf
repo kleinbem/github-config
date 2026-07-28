@@ -117,22 +117,30 @@ resource "github_repository_ruleset" "main" {
     bypass_mode = "always"
   }
 
-  # TODO(bot bypass): if you want lockfile-autopilot's GitHub App or other
-  # automations to push directly without going through PR review, add an
-  # `Integration` bypass actor here. Dependabot commits are GitHub-signed by
-  # default and will pass `required_signatures` without bypass; this is only
-  # needed for bots whose pushes don't carry verified signatures.
-  #
-  # Example:
-  #   bypass_actors {
-  #     actor_id    = data.github_app.lockfile_autopilot.installation_id
-  #     actor_type  = "Integration"
-  #     bypass_mode = "always"
-  #   }
-  #
-  # Find the ID via: `gh api /repos/kleinbem/<repo>/installation`
+  dynamic "bypass_actors" {
+    for_each = each.value.bypass_apps
+    content {
+      actor_id    = bypass_actors.value
+      actor_type  = "Integration"
+      bypass_mode = "always"
+    }
+  }
 
   depends_on = [github_repository.this]
+}
+
+# Automated CodeQL code scanning default setup for public repositories.
+resource "github_repository_code_scanning_default_setup" "this" {
+  for_each   = { for k, v in local.repos : k => v if v.visibility == "public" && v.code_scanning && v.ruleset }
+  repository = github_repository.this[each.key].name
+  state      = "configured"
+}
+
+# GitHub Actions permissions policy (authoritative per repo).
+resource "github_actions_repository_permissions" "this" {
+  for_each        = local.repos
+  repository      = github_repository.this[each.key].name
+  allowed_actions = "all"
 }
 
 # Standard label set, authoritative per repo (handles GitHub's default labels
