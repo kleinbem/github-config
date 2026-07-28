@@ -8,7 +8,7 @@ init:
     #!/usr/bin/env bash
     set -euo pipefail
     TOFU=$(command -v tofu 2>/dev/null || echo "nix develop --command tofu")
-    SECRETS="../nix/nix-secrets/secrets.yaml"
+    SECRETS="../nix-secrets/secrets.yaml"
     if [ -z "${CLOUDFLARE_ACCOUNT_ID:-}" ] && [ -f "$SECRETS" ]; then
         echo "🔐 Decrypting R2 credentials from nix-secrets (touch YubiKey if prompted)..." >&2
         if YAML=$(sops -d "$SECRETS"); then
@@ -34,7 +34,7 @@ plan: init
     #!/usr/bin/env bash
     set -euo pipefail
     TOFU=$(command -v tofu 2>/dev/null || echo "nix develop --command tofu")
-    SECRETS="../nix/nix-secrets/secrets.yaml"
+    SECRETS="../nix-secrets/secrets.yaml"
     if [ -z "${AWS_ACCESS_KEY_ID:-}" ] && [ -f "$SECRETS" ]; then
         if YAML=$(sops -d "$SECRETS"); then
             export AWS_ACCESS_KEY_ID=$(echo "$YAML" | yq '.r2_state_access_key_id')
@@ -48,7 +48,7 @@ apply: init
     #!/usr/bin/env bash
     set -euo pipefail
     TOFU=$(command -v tofu 2>/dev/null || echo "nix develop --command tofu")
-    SECRETS="../nix/nix-secrets/secrets.yaml"
+    SECRETS="../nix-secrets/secrets.yaml"
     if [ -z "${AWS_ACCESS_KEY_ID:-}" ] && [ -f "$SECRETS" ]; then
         if YAML=$(sops -d "$SECRETS"); then
             export AWS_ACCESS_KEY_ID=$(echo "$YAML" | yq '.r2_state_access_key_id')
