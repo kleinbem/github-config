@@ -30,31 +30,45 @@ init:
     $TOFU init -input=false -backend-config=.r2-endpoint.hcl
 
 # Review planned GitHub config changes (imports + in-place updates only).
-plan: init
+plan:
     #!/usr/bin/env bash
     set -euo pipefail
     TOFU=$(command -v tofu 2>/dev/null || echo "nix develop --command tofu")
     SECRETS="../nix-secrets/secrets.yaml"
-    if [ -z "${AWS_ACCESS_KEY_ID:-}" ] && [ -f "$SECRETS" ]; then
-        if YAML=$(sops -d "$SECRETS"); then
-            export AWS_ACCESS_KEY_ID=$(echo "$YAML" | yq '.r2_state_access_key_id')
-            export AWS_SECRET_ACCESS_KEY=$(echo "$YAML" | yq '.r2_state_secret_access_key')
-        fi
+    if [ -z "${CLOUDFLARE_ACCOUNT_ID:-}" ] && [ -f "$SECRETS" ]; then
+        echo "🔐 Decrypting R2 credentials from nix-secrets (touch YubiKey if prompted)..." >&2
+        YAML=$(sops -d "$SECRETS")
+        export CLOUDFLARE_ACCOUNT_ID=$(echo "$YAML" | yq '.cloudflare_account_id')
+        export AWS_ACCESS_KEY_ID=$(echo "$YAML" | yq '.r2_state_access_key_id')
+        export AWS_SECRET_ACCESS_KEY=$(echo "$YAML" | yq '.r2_state_secret_access_key')
     fi
+    if [ -z "${CLOUDFLARE_ACCOUNT_ID:-}" ] || [ "${CLOUDFLARE_ACCOUNT_ID:-}" = "null" ]; then
+        echo "❌ CLOUDFLARE_ACCOUNT_ID missing. Ensure nix-secrets is available or export CLOUDFLARE_ACCOUNT_ID." >&2
+        exit 1
+    fi
+    printf 'endpoints = { s3 = "https://%s.r2.cloudflarestorage.com" }\n' "$CLOUDFLARE_ACCOUNT_ID" > .r2-endpoint.hcl
+    $TOFU init -input=false -backend-config=.r2-endpoint.hcl
     TF_VAR_github_tf_token="$(gh auth token)" $TOFU plan
 
 # Apply the GitHub config (settings, rulesets, labels).
-apply: init
+apply:
     #!/usr/bin/env bash
     set -euo pipefail
     TOFU=$(command -v tofu 2>/dev/null || echo "nix develop --command tofu")
     SECRETS="../nix-secrets/secrets.yaml"
-    if [ -z "${AWS_ACCESS_KEY_ID:-}" ] && [ -f "$SECRETS" ]; then
-        if YAML=$(sops -d "$SECRETS"); then
-            export AWS_ACCESS_KEY_ID=$(echo "$YAML" | yq '.r2_state_access_key_id')
-            export AWS_SECRET_ACCESS_KEY=$(echo "$YAML" | yq '.r2_state_secret_access_key')
-        fi
+    if [ -z "${CLOUDFLARE_ACCOUNT_ID:-}" ] && [ -f "$SECRETS" ]; then
+        echo "🔐 Decrypting R2 credentials from nix-secrets (touch YubiKey if prompted)..." >&2
+        YAML=$(sops -d "$SECRETS")
+        export CLOUDFLARE_ACCOUNT_ID=$(echo "$YAML" | yq '.cloudflare_account_id')
+        export AWS_ACCESS_KEY_ID=$(echo "$YAML" | yq '.r2_state_access_key_id')
+        export AWS_SECRET_ACCESS_KEY=$(echo "$YAML" | yq '.r2_state_secret_access_key')
     fi
+    if [ -z "${CLOUDFLARE_ACCOUNT_ID:-}" ] || [ "${CLOUDFLARE_ACCOUNT_ID:-}" = "null" ]; then
+        echo "❌ CLOUDFLARE_ACCOUNT_ID missing. Ensure nix-secrets is available or export CLOUDFLARE_ACCOUNT_ID." >&2
+        exit 1
+    fi
+    printf 'endpoints = { s3 = "https://%s.r2.cloudflarestorage.com" }\n' "$CLOUDFLARE_ACCOUNT_ID" > .r2-endpoint.hcl
+    $TOFU init -input=false -backend-config=.r2-endpoint.hcl
     TF_VAR_github_tf_token="$(gh auth token)" $TOFU apply
 
 # One-time: migrate the existing local state into R2.
