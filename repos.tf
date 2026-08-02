@@ -32,6 +32,7 @@ locals {
     required_checks             = []
     bypass_apps                 = [] # list of GitHub App installation IDs for ruleset bypass (e.g. lockfile-autopilot)
     topics                      = [] # per-repo overrides via repo_overrides
+    extra_labels                = {} # per-repo labels on top of standard_labels (see nix-packages)
   }
 
   repo_overrides = {
@@ -66,6 +67,15 @@ locals {
       description     = "Nix User Repository (NUR)"
       required_checks = ["check"]
       topics          = ["nixos", "nix-flakes", "nur"]
+      # update-antigravity.yaml / update-langfuse.yaml tag their auto-PRs with
+      # these via peter-evans/create-pull-request, which requires the label
+      # to already exist. github_issue_labels is exhaustive per repo, so
+      # leaving them undeclared deletes them and breaks both workflows next
+      # run. Colors match what's live today.
+      extra_labels = {
+        "automated"   = { color = "ededed", description = "Opened automatically by a bot workflow" }
+        "antigravity" = { color = "ededed", description = "Antigravity IDE/CLI update PRs" }
+      }
     }
     "nix-devshells" = {
       description     = "Isolated dev environments"

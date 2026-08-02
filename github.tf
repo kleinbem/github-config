@@ -148,7 +148,7 @@ resource "github_issue_labels" "this" {
   repository = github_repository.this[each.key].name
 
   dynamic "label" {
-    for_each = local.standard_labels
+    for_each = merge(local.standard_labels, each.value.extra_labels)
     content {
       name        = label.key
       color       = label.value.color
