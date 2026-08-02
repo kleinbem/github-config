@@ -61,33 +61,41 @@ locals {
     # nix meta-workspace repos (config here; their Actions secrets live in nix/terraform).
     # Public ones get portfolio topics so they surface in GitHub search/discovery.
     "nix" = {
-      description     = "nix workspace"
-      required_checks = ["System Integration & VM Tests", "Lint & Format Audit"]
-      topics          = ["nixos", "nix-flakes", "infrastructure-as-code", "homelab", "monorepo", "jujutsu"]
+      description = "nix workspace"
+      # No required_checks: this repo's CI was retired in the meta-flake →
+      # nix-config migration (7df6612) — build-all/security-audit now live
+      # in nix-config, and "nix" itself has no workflows left to gate on.
+      topics = ["nixos", "nix-flakes", "infrastructure-as-code", "homelab", "monorepo", "jujutsu"]
     }
     "nix-config" = {
-      description = "nix-config"
-      topics      = ["nixos", "nix-flakes", "homelab", "home-manager", "nixos-config"]
+      description     = "nix-config"
+      required_checks = ["check"]
+      topics          = ["nixos", "nix-flakes", "homelab", "home-manager", "nixos-config"]
     }
     "nix-packages" = {
-      description = "Nix User Repository (NUR)"
-      topics      = ["nixos", "nix-flakes", "nur"]
+      description     = "Nix User Repository (NUR)"
+      required_checks = ["check"]
+      topics          = ["nixos", "nix-flakes", "nur"]
     }
     "nix-devshells" = {
-      description = "Isolated dev environments"
-      topics      = ["nixos", "nix-flakes", "devenv", "dev-shells"]
+      description     = "Isolated dev environments"
+      required_checks = ["check"]
+      topics          = ["nixos", "nix-flakes", "devenv", "dev-shells"]
     }
     "nix-presets" = {
-      description = "Reusable NixOS modules, hardened security policies, and Nixpak sandboxes."
-      topics      = ["nixos", "nix-flakes", "nixos-modules", "containers", "nixpak"]
+      description     = "Reusable NixOS modules, hardened security policies, and Nixpak sandboxes."
+      required_checks = ["check"]
+      topics          = ["nixos", "nix-flakes", "nixos-modules", "containers", "nixpak"]
     }
     "nix-hardware" = {
-      description = "A library of NixOS hardware modules."
-      topics      = ["nixos", "nix-flakes", "nixos-modules", "hardware"]
+      description     = "A library of NixOS hardware modules."
+      required_checks = ["check"]
+      topics          = ["nixos", "nix-flakes", "nixos-modules", "hardware"]
     }
     "nix-templates" = {
-      description = "Reproducible development environments and Flake templates for instant project bootstrapping."
-      topics      = ["nixos", "nix-flakes", "templates", "scaffolding"]
+      description     = "Reproducible development environments and Flake templates for instant project bootstrapping."
+      required_checks = ["check"]
+      topics          = ["nixos", "nix-flakes", "templates", "scaffolding"]
     }
     "nix-secrets" = { description = "Encrypted secrets for declarative NixOS configuration", visibility = "private" }
   }
