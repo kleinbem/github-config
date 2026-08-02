@@ -35,17 +35,8 @@ locals {
   }
 
   repo_overrides = {
-    "chromeos-vm-kernel"   = { description = "Custom ChromeOS VM kernel" }
-    "CodeReview"           = { description = "", visibility = "private" }
-    "dotfiles"             = { description = "dotfiles", visibility = "private" }
-    "evidence"             = { description = "", visibility = "private" }
-    "geminiapidemo"        = { description = "", visibility = "private" }
-    "github-config"        = { description = "Declarative GitHub-as-code: repo settings, rulesets, labels (Terraform) + governance reporting", visibility = "private" }
-    "kleinbem"             = { description = "It's me!" }
-    "kleinbem-ublue-build" = { description = "A personal OS image built with BlueBuild, based on bluefin-dx. Contains custom configurations, scripts, and tools for my development workflow." }
-    "kleinbem-ublue"       = { description = "My personal Universal Blue image, based on bluefin-dx. Contains custom configurations, scripts, and tools for my development workflow. " }
-    "nix-redroid-setup"    = { description = "Declarative build system for Redroid OCI images" }
-    "nix-waydroid-setup"   = { description = "Automated Waydroid setup for NixOS" }
+    "github-config" = { description = "Declarative GitHub-as-code: repo settings, rulesets, labels (Terraform) + governance reporting", visibility = "private" }
+    "kleinbem"      = { description = "It's me!" }
     # openwrt meta-workspace repos (mirrors the nix meta-workspace layout).
     # Public as a portfolio piece: secret-relevant values (SSID, passphrase,
     # lease MACs) live in openwrt-secrets; the public repos hold only structure.
@@ -53,10 +44,9 @@ locals {
       description = "OpenWrt meta-workspace — tooling orchestrator for router firmware, config, and secrets"
       topics      = ["openwrt", "ansible", "infrastructure-as-code", "homelab", "monorepo", "jujutsu"]
     }
-    "openwrt-builder"               = { description = "OpenWrt image builder" }
-    "openwrt-config"                = { description = "Managing OpenWRT network" }
-    "openwrt-secrets"               = { description = "", visibility = "private" }
-    "rename-window-gnome-extension" = { description = "" }
+    "openwrt-builder" = { description = "OpenWrt image builder" }
+    "openwrt-config"  = { description = "Managing OpenWRT network" }
+    "openwrt-secrets" = { description = "", visibility = "private" }
 
     # nix meta-workspace repos (config here; their Actions secrets live in nix/terraform).
     # Public ones get portfolio topics so they surface in GitHub search/discovery.
