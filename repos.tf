@@ -98,6 +98,12 @@ locals {
       topics          = ["nixos", "nix-flakes", "templates", "scaffolding"]
     }
     "nix-secrets" = { description = "Encrypted secrets for declarative NixOS configuration", visibility = "private" }
+    # Replaces nix-secrets/openwrt-secrets as the single sops-encrypted vault
+    # for the whole fleet (cutover 2026-08-07) — kept alongside them, not yet
+    # deleted, since nix-secrets remains referenced (personas-contact.nix
+    # exception) and openwrt-secrets content hasn't migrated. See its own
+    # README.md for the consolidation rationale.
+    "kleinbem-secrets" = { description = "Single encrypted secrets vault for the kleinbem workspace family (nix, openwrt, CI/infra, personas)", visibility = "private" }
   }
 
   repos = {
