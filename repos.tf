@@ -40,14 +40,16 @@ locals {
     "kleinbem"      = { description = "It's me!" }
     # openwrt meta-workspace repos (mirrors the nix meta-workspace layout).
     # Public as a portfolio piece: secret-relevant values (SSID, passphrase,
-    # lease MACs) live in openwrt-secrets; the public repos hold only structure.
+    # lease MACs) live in kleinbem-secrets; the public repos hold only structure.
     "openwrt" = {
       description = "OpenWrt meta-workspace — tooling orchestrator for router firmware, config, and secrets"
       topics      = ["openwrt", "ansible", "infrastructure-as-code", "homelab", "monorepo", "jujutsu"]
     }
     "openwrt-builder" = { description = "OpenWrt image builder" }
     "openwrt-config"  = { description = "Managing OpenWRT network" }
-    "openwrt-secrets" = { description = "", visibility = "private" }
+    # openwrt-secrets deleted 2026-08-08 — fully replaced by kleinbem-secrets
+    # (content migrated, every consumer repointed). Local backup kept at
+    # ../openwrt-secrets.deleted.
 
     # nix meta-workspace repos (config here; their Actions secrets live in nix/terraform).
     # Public ones get portfolio topics so they surface in GitHub search/discovery.
@@ -97,12 +99,12 @@ locals {
       required_checks = ["check"]
       topics          = ["nixos", "nix-flakes", "templates", "scaffolding"]
     }
-    "nix-secrets" = { description = "Encrypted secrets for declarative NixOS configuration", visibility = "private" }
-    # Replaces nix-secrets/openwrt-secrets as the single sops-encrypted vault
-    # for the whole fleet (cutover 2026-08-07) — kept alongside them, not yet
-    # deleted, since nix-secrets remains referenced (personas-contact.nix
-    # exception) and openwrt-secrets content hasn't migrated. See its own
-    # README.md for the consolidation rationale.
+    # nix-secrets deleted 2026-08-08 — fully replaced by kleinbem-secrets
+    # (cutover done, zero live consumers left). Local backup kept at
+    # ../nix-secrets.deleted.
+    #
+    # Single sops-encrypted vault for the whole fleet — nix, openwrt,
+    # CI/infra, personas. See its own README.md for the design rationale.
     "kleinbem-secrets" = { description = "Single encrypted secrets vault for the kleinbem workspace family (nix, openwrt, CI/infra, personas)", visibility = "private" }
   }
 
