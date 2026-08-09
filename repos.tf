@@ -36,8 +36,16 @@ locals {
   }
 
   repo_overrides = {
-    "github-config" = { description = "Declarative GitHub-as-code: repo settings, rulesets, labels (Terraform) + governance reporting", visibility = "private" }
-    "kleinbem"      = { description = "It's me!" }
+    # allow_auto_merge: GitHub silently won't persist this as true on private
+    # repos on this account's plan (PATCH returns 200 but the field reverts) —
+    # declaring false here matches reality so `tofu plan` stops reporting
+    # permanent phantom drift. Same override on kleinbem-secrets below.
+    "github-config" = {
+      description      = "Declarative GitHub-as-code: repo settings, rulesets, labels (Terraform) + governance reporting"
+      visibility       = "private"
+      allow_auto_merge = false
+    }
+    "kleinbem" = { description = "It's me!" }
     # openwrt meta-workspace repos (mirrors the nix meta-workspace layout).
     # Public as a portfolio piece: secret-relevant values (SSID, passphrase,
     # lease MACs) live in kleinbem-secrets; the public repos hold only structure.
@@ -105,7 +113,13 @@ locals {
     #
     # Single sops-encrypted vault for the whole fleet — nix, openwrt,
     # CI/infra, personas. See its own README.md for the design rationale.
-    "kleinbem-secrets" = { description = "Single encrypted secrets vault for the kleinbem workspace family (nix, openwrt, CI/infra, personas)", visibility = "private" }
+    # allow_auto_merge: see github-config's override above — same
+    # non-persisting-on-private-repos behavior applies here too.
+    "kleinbem-secrets" = {
+      description      = "Single encrypted secrets vault for the kleinbem workspace family (nix, openwrt, CI/infra, personas)"
+      visibility       = "private"
+      allow_auto_merge = false
+    }
   }
 
   repos = {
