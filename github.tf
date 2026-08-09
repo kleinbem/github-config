@@ -58,6 +58,12 @@ resource "github_repository" "this" {
 
   lifecycle {
     prevent_destroy = true
+    # template: create-time-only provenance (which template repo a repo was
+    # generated from, e.g. nix-packages <- nix-community/nur-packages-template).
+    # GitHub has no API to clear it post-creation, so it's not something
+    # repos.tf ever declares — ignore it so tofu plan stops proposing the
+    # same never-applicable removal on every run.
+    ignore_changes = [template]
   }
 }
 
