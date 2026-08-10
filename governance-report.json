@@ -1,13 +1,13 @@
 {
-  "generated": "2026-08-03 09:17 UTC",
+  "generated": "2026-08-10 08:39 UTC",
   "repos": [
     {
       "repo": "nix-config",
       "visibility": "public",
-      "branches": 2,
+      "branches": 1,
       "open_issues": 0,
       "stale_branches": 0,
-      "workflows_active": 9,
+      "workflows_active": 10,
       "workflows_disabled": 0,
       "community_score": 0,
       "ai_tools": [
@@ -16,17 +16,63 @@
       "has_description": true
     },
     {
-      "repo": "openwrt-config",
+      "repo": "nix-presets",
       "visibility": "public",
       "branches": 1,
       "open_issues": 0,
       "stale_branches": 0,
-      "workflows_active": 1,
+      "workflows_active": 4,
       "workflows_disabled": 0,
       "community_score": 0,
-      "ai_tools": [
-        "Antigravity"
-      ],
+      "ai_tools": [],
+      "has_description": true
+    },
+    {
+      "repo": "nix-hardware",
+      "visibility": "public",
+      "branches": 1,
+      "open_issues": 0,
+      "stale_branches": 0,
+      "workflows_active": 2,
+      "workflows_disabled": 0,
+      "community_score": 0,
+      "ai_tools": [],
+      "has_description": true
+    },
+    {
+      "repo": "nix-packages",
+      "visibility": "public",
+      "branches": 1,
+      "open_issues": 0,
+      "stale_branches": 0,
+      "workflows_active": 8,
+      "workflows_disabled": 0,
+      "community_score": 0,
+      "ai_tools": [],
+      "has_description": true
+    },
+    {
+      "repo": "nix-templates",
+      "visibility": "public",
+      "branches": 1,
+      "open_issues": 0,
+      "stale_branches": 0,
+      "workflows_active": 2,
+      "workflows_disabled": 0,
+      "community_score": 0,
+      "ai_tools": [],
+      "has_description": true
+    },
+    {
+      "repo": "nix-devshells",
+      "visibility": "public",
+      "branches": 1,
+      "open_issues": 0,
+      "stale_branches": 0,
+      "workflows_active": 3,
+      "workflows_disabled": 0,
+      "community_score": 0,
+      "ai_tools": [],
       "has_description": true
     },
     {
@@ -45,62 +91,12 @@
       "has_description": true
     },
     {
-      "repo": "nix-secrets",
+      "repo": "kleinbem-secrets",
       "visibility": "private",
       "branches": 1,
       "open_issues": 0,
       "stale_branches": 0,
       "workflows_active": 0,
-      "workflows_disabled": 0,
-      "community_score": 25,
-      "ai_tools": [],
-      "has_description": true
-    },
-    {
-      "repo": "openwrt",
-      "visibility": "public",
-      "branches": 1,
-      "open_issues": 0,
-      "stale_branches": 0,
-      "workflows_active": 0,
-      "workflows_disabled": 0,
-      "community_score": 25,
-      "ai_tools": [
-        "Antigravity"
-      ],
-      "has_description": true
-    },
-    {
-      "repo": "github-config",
-      "visibility": "private",
-      "branches": 1,
-      "open_issues": 0,
-      "stale_branches": 0,
-      "workflows_active": 0,
-      "workflows_disabled": 0,
-      "community_score": 0,
-      "ai_tools": [],
-      "has_description": true
-    },
-    {
-      "repo": "nix-packages",
-      "visibility": "public",
-      "branches": 3,
-      "open_issues": 0,
-      "stale_branches": 0,
-      "workflows_active": 7,
-      "workflows_disabled": 0,
-      "community_score": 0,
-      "ai_tools": [],
-      "has_description": true
-    },
-    {
-      "repo": "nix-presets",
-      "visibility": "public",
-      "branches": 5,
-      "open_issues": 0,
-      "stale_branches": 0,
-      "workflows_active": 3,
       "workflows_disabled": 0,
       "community_score": 0,
       "ai_tools": [],
@@ -119,43 +115,19 @@
       "has_description": true
     },
     {
-      "repo": "nix-templates",
-      "visibility": "public",
-      "branches": 2,
+      "repo": "github-config",
+      "visibility": "private",
+      "branches": 1,
       "open_issues": 0,
       "stale_branches": 0,
-      "workflows_active": 2,
+      "workflows_active": 0,
       "workflows_disabled": 0,
       "community_score": 0,
       "ai_tools": [],
       "has_description": true
     },
     {
-      "repo": "nix-hardware",
-      "visibility": "public",
-      "branches": 2,
-      "open_issues": 0,
-      "stale_branches": 0,
-      "workflows_active": 2,
-      "workflows_disabled": 0,
-      "community_score": 0,
-      "ai_tools": [],
-      "has_description": true
-    },
-    {
-      "repo": "nix-devshells",
-      "visibility": "public",
-      "branches": 2,
-      "open_issues": 0,
-      "stale_branches": 0,
-      "workflows_active": 3,
-      "workflows_disabled": 0,
-      "community_score": 0,
-      "ai_tools": [],
-      "has_description": true
-    },
-    {
-      "repo": "openwrt-builder",
+      "repo": "openwrt-config",
       "visibility": "public",
       "branches": 1,
       "open_issues": 0,
@@ -169,16 +141,32 @@
       "has_description": true
     },
     {
-      "repo": "openwrt-secrets",
-      "visibility": "private",
+      "repo": "openwrt-builder",
+      "visibility": "public",
+      "branches": 1,
+      "open_issues": 0,
+      "stale_branches": 0,
+      "workflows_active": 2,
+      "workflows_disabled": 0,
+      "community_score": 0,
+      "ai_tools": [
+        "Antigravity"
+      ],
+      "has_description": true
+    },
+    {
+      "repo": "openwrt",
+      "visibility": "public",
       "branches": 1,
       "open_issues": 0,
       "stale_branches": 0,
       "workflows_active": 0,
       "workflows_disabled": 0,
-      "community_score": 0,
-      "ai_tools": [],
-      "has_description": false
+      "community_score": 25,
+      "ai_tools": [
+        "Antigravity"
+      ],
+      "has_description": true
     }
   ]
 }
