@@ -120,6 +120,10 @@ locals {
       visibility       = "private"
       allow_auto_merge = false
     }
+    "kleinbem-site" = {
+      description = "kleinbem.dev — personal site (Astro + Svelte + Tailwind)"
+      topics      = ["astro", "svelte", "tailwindcss", "personal-website"]
+    }
   }
 
   repos = {
