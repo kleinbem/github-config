@@ -1,6 +1,6 @@
 # Governance Dashboard
 
-_Generated 2026-08-17 08:19 UTC — read-only report; enforcement lives in Terraform._
+_Generated 2026-08-24 08:21 UTC — read-only report; enforcement lives in Terraform._
 
 | Repo | Vis | Branches | Open issues | Stale | Workflows (✓/✗) | Community | AI |
 |---|---|--:|--:|--:|--|--:|--|
