@@ -121,8 +121,9 @@ locals {
       allow_auto_merge = false
     }
     "kleinbem-site" = {
-      description = "kleinbem.dev — personal site (Astro + Svelte + Tailwind)"
-      topics      = ["astro", "svelte", "tailwindcss", "personal-website"]
+      description     = "kleinbem.dev — personal site (Astro + Svelte + Tailwind)"
+      required_checks = ["build"] # job name in kleinbem-site/.github/workflows/ci.yaml
+      topics          = ["astro", "svelte", "tailwindcss", "personal-website"]
     }
   }
 
