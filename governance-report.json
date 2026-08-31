@@ -1,27 +1,13 @@
 {
-  "generated": "2026-08-24 08:21 UTC",
+  "generated": "2026-08-31 08:27 UTC",
   "repos": [
     {
-      "repo": "nix-config",
-      "visibility": "public",
-      "branches": 2,
-      "open_issues": 0,
-      "stale_branches": 0,
-      "workflows_active": 10,
-      "workflows_disabled": 0,
-      "community_score": 0,
-      "ai_tools": [
-        "Claude"
-      ],
-      "has_description": true
-    },
-    {
-      "repo": "nix-presets",
+      "repo": "nix-hardware",
       "visibility": "public",
       "branches": 1,
       "open_issues": 0,
       "stale_branches": 0,
-      "workflows_active": 4,
+      "workflows_active": 2,
       "workflows_disabled": 0,
       "community_score": 0,
       "ai_tools": [],
@@ -30,22 +16,10 @@
     {
       "repo": "nix-packages",
       "visibility": "public",
-      "branches": 3,
+      "branches": 2,
       "open_issues": 0,
       "stale_branches": 0,
       "workflows_active": 8,
-      "workflows_disabled": 0,
-      "community_score": 0,
-      "ai_tools": [],
-      "has_description": true
-    },
-    {
-      "repo": "nix-hardware",
-      "visibility": "public",
-      "branches": 1,
-      "open_issues": 0,
-      "stale_branches": 0,
-      "workflows_active": 2,
       "workflows_disabled": 0,
       "community_score": 0,
       "ai_tools": [],
@@ -64,12 +38,38 @@
       "has_description": true
     },
     {
-      "repo": "github-config",
-      "visibility": "private",
+      "repo": "nix-devshells",
+      "visibility": "public",
+      "branches": 1,
+      "open_issues": 0,
+      "stale_branches": 0,
+      "workflows_active": 3,
+      "workflows_disabled": 0,
+      "community_score": 0,
+      "ai_tools": [],
+      "has_description": true
+    },
+    {
+      "repo": "nix-config",
+      "visibility": "public",
       "branches": 2,
       "open_issues": 0,
       "stale_branches": 0,
-      "workflows_active": 0,
+      "workflows_active": 10,
+      "workflows_disabled": 0,
+      "community_score": 0,
+      "ai_tools": [
+        "Claude"
+      ],
+      "has_description": true
+    },
+    {
+      "repo": "nix-presets",
+      "visibility": "public",
+      "branches": 2,
+      "open_issues": 0,
+      "stale_branches": 0,
+      "workflows_active": 4,
       "workflows_disabled": 0,
       "community_score": 0,
       "ai_tools": [],
@@ -81,16 +81,28 @@
       "branches": 1,
       "open_issues": 0,
       "stale_branches": 0,
+      "workflows_active": 1,
+      "workflows_disabled": 0,
+      "community_score": 0,
+      "ai_tools": [],
+      "has_description": true
+    },
+    {
+      "repo": "github-config",
+      "visibility": "private",
+      "branches": 1,
+      "open_issues": 0,
+      "stale_branches": 0,
       "workflows_active": 0,
       "workflows_disabled": 0,
       "community_score": 0,
       "ai_tools": [],
-      "has_description": false
+      "has_description": true
     },
     {
-      "repo": "nix-devshells",
+      "repo": "kleinbem",
       "visibility": "public",
-      "branches": 1,
+      "branches": 2,
       "open_issues": 0,
       "stale_branches": 0,
       "workflows_active": 3,
@@ -118,18 +130,6 @@
       "repo": "kleinbem-secrets",
       "visibility": "private",
       "branches": 1,
-      "open_issues": 0,
-      "stale_branches": 0,
-      "workflows_active": 0,
-      "workflows_disabled": 0,
-      "community_score": 0,
-      "ai_tools": [],
-      "has_description": true
-    },
-    {
-      "repo": "kleinbem",
-      "visibility": "public",
-      "branches": 2,
       "open_issues": 0,
       "stale_branches": 0,
       "workflows_active": 0,
