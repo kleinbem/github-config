@@ -124,6 +124,10 @@ locals {
       description = "kleinbem.dev — personal site (Astro + Svelte + Tailwind)"
       topics      = ["astro", "svelte", "tailwindcss", "personal-website"]
     }
+    "kleinbem-auth" = {
+      description = "Self-hosted auth (better-auth) for kleinbem.dev — Google/Facebook/etc. login for site visitors"
+      topics      = ["better-auth", "nodejs", "sqlite", "oauth"]
+    }
   }
 
   repos = {
