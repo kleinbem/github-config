@@ -135,6 +135,13 @@ locals {
     for name, ov in local.repo_overrides : name => merge(local.repo_defaults, ov)
   }
 
+  # Repos declared above but not yet on GitHub. The import block in github.tf
+  # skips these, so `github_repository.this` CREATES them (the CI GitHub App has
+  # Administration:write) instead of failing on a non-existent import target.
+  # Remove an entry once its first apply has run — after that the import block
+  # adopts it like every other repo (a no-op, since it's already in state).
+  repos_pending_create = ["kleinbem-auth"]
+
   # Standard label set (migrated from labels.yaml). Same set the nix config uses.
   standard_labels = {
     "bug"              = { color = "d73a4a", description = "Something isn't working" }
