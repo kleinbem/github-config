@@ -4,16 +4,11 @@
 # Repo map + labels live in repos.tf.
 # ---------------------------------------------------------------------------
 
-# Adopt existing repos (import); prevent_destroy guards them. Repos listed in
-# local.repos_pending_create are skipped here so github_repository.this creates
-# them on first apply instead of failing on a non-existent import target.
+# Adopt existing repos (import, never create); prevent_destroy guards them.
 import {
-  for_each = {
-    for k, v in local.repos : k => v
-    if !contains(local.repos_pending_create, k)
-  }
-  to = github_repository.this[each.key]
-  id = each.key
+  for_each = local.repos
+  to       = github_repository.this[each.key]
+  id       = each.key
 }
 
 resource "github_repository" "this" {
