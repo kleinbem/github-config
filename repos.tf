@@ -125,6 +125,10 @@ locals {
       required_checks = ["build"] # job name in kleinbem-site/.github/workflows/ci.yaml
       topics          = ["astro", "svelte", "tailwindcss", "personal-website"]
     }
+    "kleinbem-auth" = {
+      description = "Self-hosted auth (better-auth) for kleinbem.dev — Google/Facebook/etc. login for site visitors"
+      topics      = ["better-auth", "nodejs", "sqlite", "oauth"]
+    }
   }
 
   repos = {
