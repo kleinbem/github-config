@@ -55,7 +55,8 @@ plan:
     fi
     printf 'endpoints = { s3 = "https://%s.r2.cloudflarestorage.com" }\n' "$CLOUDFLARE_ACCOUNT_ID" > .r2-endpoint.hcl
     $TOFU init -input=false -backend-config=.r2-endpoint.hcl
-    TF_VAR_github_tf_token="$(gh auth token)" $TOFU plan
+    source scripts/gh-app-env.sh
+    $TOFU plan
 
 # Apply the GitHub config (settings, rulesets, labels).
 apply:
@@ -78,7 +79,8 @@ apply:
     fi
     printf 'endpoints = { s3 = "https://%s.r2.cloudflarestorage.com" }\n' "$CLOUDFLARE_ACCOUNT_ID" > .r2-endpoint.hcl
     $TOFU init -input=false -backend-config=.r2-endpoint.hcl
-    TF_VAR_github_tf_token="$(gh auth token)" $TOFU apply
+    source scripts/gh-app-env.sh
+    $TOFU apply
 
 # One-time: migrate the existing local state into R2.
 migrate-state: init
