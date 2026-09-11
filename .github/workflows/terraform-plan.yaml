@@ -16,46 +16,30 @@ on:
 permissions:
   contents: read
 
+env:
+  # R2 remote-state backend — needed by every tofu state operation. GitHub
+  # provider auth (TF_VAR_github_app_*) is wired by the tofu-setup composite
+  # action from the APP_* secrets; the provider's `app_auth {}` then mints a
+  # short-lived installation token (Administration + Issues + Metadata).
+  CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+  AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+  AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+
 jobs:
   plan:
     runs-on: ubuntu-latest
-    env:
-      # R2 remote-state backend. GitHub provider auth is set from Actions
-      # secrets in the step below (TF_VAR_github_app_*) — the provider's
-      # `app_auth {}` mints a short-lived installation token (Administration +
-      # Issues + Metadata on the managed repos).
-      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-      AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
-      AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
     steps:
       - uses: actions/checkout@v4
-      - uses: opentofu/setup-opentofu@v1
 
-      - name: Configure GitHub App auth for the tofu provider
-        env:
-          APP_ID: ${{ secrets.APP_ID }}
-          APP_INSTALLATION_ID: ${{ secrets.APP_INSTALLATION_ID }}
-          APP_PRIVATE_KEY: ${{ secrets.APP_PRIVATE_KEY }}
-        run: |
-          # provider `app_auth {}` reads these via TF_VAR_*; pem_file takes the
-          # PEM contents, not a path. GITHUB_ENV masks multi-line secrets fine.
-          {
-            echo "TF_VAR_github_app_id=$APP_ID"
-            echo "TF_VAR_github_app_installation_id=$APP_INSTALLATION_ID"
-            echo "TF_VAR_github_app_pem<<__PEM_EOF__"
-            printf '%s\n' "$APP_PRIVATE_KEY"
-            echo "__PEM_EOF__"
-          } >> "$GITHUB_ENV"
-
-      - name: tofu init (R2 backend)
-        run: |
-          printf 'endpoints = { s3 = "https://%s.r2.cloudflarestorage.com" }\n' \
-            "$CLOUDFLARE_ACCOUNT_ID" > .r2-endpoint.hcl
-          tofu init -input=false -backend-config=.r2-endpoint.hcl
+      - uses: ./.github/actions/tofu-setup
+        with:
+          app-id: ${{ secrets.APP_ID }}
+          app-installation-id: ${{ secrets.APP_INSTALLATION_ID }}
+          app-private-key: ${{ secrets.APP_PRIVATE_KEY }}
 
       - name: tofu plan
         run: |
-          tofu plan -input=false -no-color -detailed-exitcode 2>&1 | tee plan.txt || ec=$?
+          tofu plan -input=false -no-color -lock-timeout=120s -detailed-exitcode 2>&1 | tee plan.txt || ec=$?
           {
             echo "## tofu plan — github-config"
             case "${ec:-0}" in

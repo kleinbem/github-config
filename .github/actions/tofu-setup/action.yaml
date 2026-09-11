@@ -1,0 +1,47 @@
+name: "tofu setup (github-config)"
+description: >-
+  Installs OpenTofu, wires the GitHub App credentials the provider's `app_auth {}`
+  reads (TF_VAR_github_app_*), and runs `tofu init` against the R2 backend.
+  The caller must run actions/checkout first and provide CLOUDFLARE_ACCOUNT_ID +
+  AWS_ACCESS_KEY_ID + AWS_SECRET_ACCESS_KEY in the job `env:` (needed by every
+  later tofu state operation, not just init).
+
+inputs:
+  app-id:
+    required: true
+    description: GitHub App ID (APP_ID secret).
+  app-installation-id:
+    required: true
+    description: GitHub App installation ID on the kleinbem account (APP_INSTALLATION_ID secret).
+  app-private-key:
+    required: true
+    description: GitHub App private key, PEM contents (APP_PRIVATE_KEY secret).
+
+runs:
+  using: composite
+  steps:
+    - uses: opentofu/setup-opentofu@v1
+
+    - name: GitHub App auth → TF_VAR_github_app_*
+      shell: bash
+      env:
+        APP_ID: ${{ inputs.app-id }}
+        APP_INSTALLATION_ID: ${{ inputs.app-installation-id }}
+        APP_PRIVATE_KEY: ${{ inputs.app-private-key }}
+      run: |
+        # provider `app_auth {}` reads these; pem_file takes the PEM contents,
+        # not a path. GITHUB_ENV's heredoc form carries the multi-line key fine.
+        {
+          echo "TF_VAR_github_app_id=$APP_ID"
+          echo "TF_VAR_github_app_installation_id=$APP_INSTALLATION_ID"
+          echo "TF_VAR_github_app_pem<<__PEM_EOF__"
+          printf '%s\n' "$APP_PRIVATE_KEY"
+          echo "__PEM_EOF__"
+        } >> "$GITHUB_ENV"
+
+    - name: tofu init (R2 backend)
+      shell: bash
+      run: |
+        printf 'endpoints = { s3 = "https://%s.r2.cloudflarestorage.com" }\n' \
+          "$CLOUDFLARE_ACCOUNT_ID" > .r2-endpoint.hcl
+        tofu init -input=false -backend-config=.r2-endpoint.hcl
