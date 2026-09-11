@@ -38,15 +38,52 @@ jobs:
           app-private-key: ${{ secrets.APP_PRIVATE_KEY }}
 
       - name: tofu plan
+        id: plan
         run: |
           tofu plan -input=false -no-color -lock-timeout=120s -detailed-exitcode 2>&1 | tee plan.txt || ec=$?
+          case "${ec:-0}" in
+            0) drift=none;    head="✅ No drift — GitHub matches the declared config." ;;
+            2) drift=changes; head="⚠️ **Drift detected** — see the \`~\`/\`-\`/\`+\` lines below." ;;
+            *) drift=error;   head="❌ Plan errored." ;;
+          esac
+          echo "drift=$drift" >> "$GITHUB_OUTPUT"
           {
             echo "## tofu plan — github-config"
-            case "${ec:-0}" in
-              0) echo "✅ No drift — GitHub matches the declared config." ;;
-              2) echo "⚠️ **Drift detected** — see the \`~\`/\`-\`/\`+\` lines below." ;;
-              *) echo "❌ Plan errored." ;;
-            esac
+            echo "$head"
             echo '```'; tail -c 60000 plan.txt; echo '```'
           } >> "$GITHUB_STEP_SUMMARY"
-          [ "${ec:-0}" = "1" ] && exit 1 || exit 0
+          [ "$drift" = "error" ] && exit 1 || exit 0
+
+      # Scheduled drift check: a non-clean result on the Monday cron means a
+      # setting/ruleset/label changed in GitHub's UI since the last apply (or the
+      # plan itself broke). The step summary alone gets missed — ping the human
+      # alert topic. PR runs never alert (a "drift" there is just the PR's diff);
+      # only `schedule`. Best-effort: a missing/unreachable ntfy never fails the
+      # run. NTFY_ALERT_TOPIC is distributed by nix/infra/github-secrets.tf.
+      - name: Alert on drift via ntfy (best-effort)
+        if: >-
+          always() && github.event_name == 'schedule'
+          && (steps.plan.outputs.drift == 'changes' || steps.plan.outputs.drift == 'error')
+        continue-on-error: true
+        env:
+          NTFY_TOPIC: ${{ secrets.NTFY_ALERT_TOPIC }}
+          DRIFT: ${{ steps.plan.outputs.drift }}
+        run: |
+          set -euo pipefail
+          if [ -z "${NTFY_TOPIC:-}" ]; then
+            echo "NTFY_ALERT_TOPIC not set — skipping alert."
+            exit 0
+          fi
+          if [ "$DRIFT" = "error" ]; then
+            title="github-config: drift plan ERRORED"
+            body="The scheduled tofu plan for github-config failed to run — GitHub config state is unverified."
+          else
+            title="github-config: DRIFT detected"
+            body="Scheduled tofu plan found GitHub config that no longer matches Terraform — likely a setting/ruleset/label changed in the UI. Reconcile via a PR, or apply."
+          fi
+          curl -fsS --max-time 15 \
+            -H "Title: $title" \
+            -H "Tags: warning" \
+            -H "Priority: high" \
+            -d "$body Run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}" \
+            "https://ntfy.kleinbem.dev/$NTFY_TOPIC"
