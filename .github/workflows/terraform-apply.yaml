@@ -1,8 +1,16 @@
 name: Terraform Apply (GitOps deploy)
 
-# Runs `tofu apply -auto-approve` against the shared R2 state when changes are
-# pushed or merged to the default branch. This strictly enforces the GitOps
-# deployment model: PRs are used to preview the plan, and merges apply it.
+# Merge to main (or manual dispatch) → plan → apply the EXACT saved plan.
+#
+# The `apply` job consumes the `tfplan` artifact the `plan` job produced — there
+# is no re-plan between the two, so what gets applied is precisely what the plan
+# showed and what you can read in the run summary / artifact. If the shared R2
+# state moved between plan and apply, OpenTofu rejects the stale plan file rather
+# than applying stale intent. `concurrency` keeps a second merge from racing an
+# in-flight apply. If the plan is a no-op, `apply` is skipped entirely.
+#
+# PRs get their preview from terraform-plan.yaml. `just apply` is the local
+# break-glass path.
 
 on:
   push:
@@ -12,46 +20,87 @@ on:
       - '**.tf'
   workflow_dispatch:
 
+concurrency:
+  group: terraform-apply
+  cancel-in-progress: false
+
 permissions:
   contents: read
 
+env:
+  # R2 remote-state backend — needed by every tofu state operation, so it lives
+  # at workflow scope. GitHub provider auth (TF_VAR_github_app_*) is wired by the
+  # tofu-setup composite action from the APP_* secrets.
+  CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+  AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+  AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+
 jobs:
-  apply:
+  plan:
     runs-on: ubuntu-latest
-    env:
-      # R2 remote-state backend. GitHub provider auth is set from Actions
-      # secrets in the step below (TF_VAR_github_app_*) — the provider's
-      # `app_auth {}` mints a short-lived installation token (Administration +
-      # Issues + Metadata on the managed repos).
-      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-      AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
-      AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+    outputs:
+      has_changes: ${{ steps.plan.outputs.has_changes }}
     steps:
       - uses: actions/checkout@v4
-      - uses: opentofu/setup-opentofu@v1
 
-      - name: Configure GitHub App auth for the tofu provider
-        env:
-          APP_ID: ${{ secrets.APP_ID }}
-          APP_INSTALLATION_ID: ${{ secrets.APP_INSTALLATION_ID }}
-          APP_PRIVATE_KEY: ${{ secrets.APP_PRIVATE_KEY }}
+      - uses: ./.github/actions/tofu-setup
+        with:
+          app-id: ${{ secrets.APP_ID }}
+          app-installation-id: ${{ secrets.APP_INSTALLATION_ID }}
+          app-private-key: ${{ secrets.APP_PRIVATE_KEY }}
+
+      - name: tofu plan
+        id: plan
         run: |
-          # provider `app_auth {}` reads these via TF_VAR_*; pem_file takes the
-          # PEM contents, not a path. GITHUB_ENV masks multi-line secrets fine.
+          tofu plan -input=false -no-color -lock-timeout=120s \
+            -out=tfplan -detailed-exitcode 2>&1 | tee plan.txt || ec=$?
+          case "${ec:-0}" in
+            0) echo "has_changes=false" >> "$GITHUB_OUTPUT"; note="✅ No changes — nothing to apply." ;;
+            2) echo "has_changes=true"  >> "$GITHUB_OUTPUT"; note="📝 Changes planned — applying the saved plan below." ;;
+            *) note="❌ Plan errored." ;;
+          esac
           {
-            echo "TF_VAR_github_app_id=$APP_ID"
-            echo "TF_VAR_github_app_installation_id=$APP_INSTALLATION_ID"
-            echo "TF_VAR_github_app_pem<<__PEM_EOF__"
-            printf '%s\n' "$APP_PRIVATE_KEY"
-            echo "__PEM_EOF__"
-          } >> "$GITHUB_ENV"
+            echo "## tofu plan — github-config"
+            echo "$note"
+            echo '```'
+            tail -c 60000 plan.txt
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+          [ "${ec:-0}" = "1" ] && exit 1 || exit 0
 
-      - name: tofu init (R2 backend)
-        run: |
-          printf 'endpoints = { s3 = "https://%s.r2.cloudflarestorage.com" }\n' \
-            "$CLOUDFLARE_ACCOUNT_ID" > .r2-endpoint.hcl
-          tofu init -input=false -backend-config=.r2-endpoint.hcl
+      # Ship the lock file with the plan so the apply job's `tofu init` resolves
+      # the exact same provider build the plan was made against (the lock is
+      # gitignored here, so each init would otherwise re-resolve `~> 6.0`).
+      - name: Upload saved plan
+        if: steps.plan.outputs.has_changes == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: tfplan
+          path: |
+            tfplan
+            .terraform.lock.hcl
+          retention-days: 5
+          if-no-files-found: error
 
-      - name: tofu apply
+  apply:
+    needs: plan
+    if: needs.plan.outputs.has_changes == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # Before tofu-setup's `tofu init`, so the pinned lock is in place.
+      - name: Download saved plan
+        uses: actions/download-artifact@v4
+        with:
+          name: tfplan
+
+      - uses: ./.github/actions/tofu-setup
+        with:
+          app-id: ${{ secrets.APP_ID }}
+          app-installation-id: ${{ secrets.APP_INSTALLATION_ID }}
+          app-private-key: ${{ secrets.APP_PRIVATE_KEY }}
+
+      - name: tofu apply (saved plan)
         run: |
-          tofu apply -auto-approve -input=false
+          tofu apply -input=false -lock-timeout=120s -no-color tfplan
