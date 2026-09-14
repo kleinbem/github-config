@@ -1,11 +1,23 @@
 {
-  "generated": "2026-09-07 08:28 UTC",
+  "generated": "2026-09-14 14:56 UTC",
   "repos": [
+    {
+      "repo": "kleinbem-site",
+      "visibility": "public",
+      "branches": 2,
+      "open_issues": 0,
+      "stale_branches": 0,
+      "workflows_active": 2,
+      "workflows_disabled": 0,
+      "community_score": 0,
+      "ai_tools": [],
+      "has_description": true
+    },
     {
       "repo": "nix-config",
       "visibility": "public",
       "branches": 1,
-      "open_issues": 0,
+      "open_issues": 1,
       "stale_branches": 0,
       "workflows_active": 11,
       "workflows_disabled": 0,
@@ -13,18 +25,6 @@
       "ai_tools": [
         "Claude"
       ],
-      "has_description": true
-    },
-    {
-      "repo": "nix-presets",
-      "visibility": "public",
-      "branches": 1,
-      "open_issues": 0,
-      "stale_branches": 0,
-      "workflows_active": 4,
-      "workflows_disabled": 0,
-      "community_score": 0,
-      "ai_tools": [],
       "has_description": true
     },
     {
@@ -42,10 +42,10 @@
     {
       "repo": "nix-packages",
       "visibility": "public",
-      "branches": 1,
+      "branches": 2,
       "open_issues": 0,
       "stale_branches": 0,
-      "workflows_active": 8,
+      "workflows_active": 9,
       "workflows_disabled": 0,
       "community_score": 0,
       "ai_tools": [],
@@ -76,24 +76,36 @@
       "has_description": true
     },
     {
-      "repo": "kleinbem-secrets",
-      "visibility": "private",
-      "branches": 1,
+      "repo": "kleinbem-auth",
+      "visibility": "public",
+      "branches": 2,
       "open_issues": 0,
       "stale_branches": 0,
-      "workflows_active": 0,
+      "workflows_active": 2,
       "workflows_disabled": 0,
       "community_score": 0,
       "ai_tools": [],
       "has_description": true
     },
     {
-      "repo": "kleinbem-site",
+      "repo": "nix-presets",
       "visibility": "public",
       "branches": 1,
       "open_issues": 0,
       "stale_branches": 0,
-      "workflows_active": 1,
+      "workflows_active": 4,
+      "workflows_disabled": 0,
+      "community_score": 0,
+      "ai_tools": [],
+      "has_description": true
+    },
+    {
+      "repo": "kleinbem-secrets",
+      "visibility": "private",
+      "branches": 1,
+      "open_issues": 0,
+      "stale_branches": 0,
+      "workflows_active": 0,
       "workflows_disabled": 0,
       "community_score": 0,
       "ai_tools": [],
@@ -115,17 +127,15 @@
       "has_description": true
     },
     {
-      "repo": "openwrt",
+      "repo": "kleinbem",
       "visibility": "public",
       "branches": 1,
       "open_issues": 0,
       "stale_branches": 0,
-      "workflows_active": 0,
+      "workflows_active": 3,
       "workflows_disabled": 0,
-      "community_score": 25,
-      "ai_tools": [
-        "Antigravity"
-      ],
+      "community_score": 0,
+      "ai_tools": [],
       "has_description": true
     },
     {
@@ -141,27 +151,53 @@
       "has_description": true
     },
     {
-      "repo": "kleinbem",
+      "repo": ".github",
       "visibility": "public",
       "branches": 1,
       "open_issues": 0,
       "stale_branches": 0,
-      "workflows_active": 3,
+      "workflows_active": 0,
       "workflows_disabled": 0,
       "community_score": 0,
       "ai_tools": [],
       "has_description": true
     },
     {
-      "repo": "kleinbem-auth",
+      "repo": "nix-toolbox",
       "visibility": "public",
       "branches": 1,
       "open_issues": 0,
       "stale_branches": 0,
-      "workflows_active": 1,
+      "workflows_active": 0,
       "workflows_disabled": 0,
       "community_score": 0,
       "ai_tools": [],
+      "has_description": true
+    },
+    {
+      "repo": "jj-toolbox",
+      "visibility": "public",
+      "branches": 1,
+      "open_issues": 0,
+      "stale_branches": 0,
+      "workflows_active": 0,
+      "workflows_disabled": 0,
+      "community_score": 0,
+      "ai_tools": [],
+      "has_description": true
+    },
+    {
+      "repo": "openwrt",
+      "visibility": "public",
+      "branches": 1,
+      "open_issues": 0,
+      "stale_branches": 0,
+      "workflows_active": 0,
+      "workflows_disabled": 0,
+      "community_score": 25,
+      "ai_tools": [
+        "Antigravity"
+      ],
       "has_description": true
     },
     {
@@ -176,6 +212,18 @@
       "ai_tools": [
         "Antigravity"
       ],
+      "has_description": true
+    },
+    {
+      "repo": "kleinbem-actions",
+      "visibility": "public",
+      "branches": 0,
+      "open_issues": 0,
+      "stale_branches": 0,
+      "workflows_active": 0,
+      "workflows_disabled": 0,
+      "community_score": 0,
+      "ai_tools": [],
       "has_description": true
     },
     {
