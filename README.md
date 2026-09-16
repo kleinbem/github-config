@@ -42,7 +42,7 @@ We use a full **Enterprise GitOps** pipeline to manage infrastructure safely:
 
 You no longer need to execute `just apply` locally!
 
-*(Note: The `TF_GITHUB_TOKEN` secret in GitHub Actions requires a fine-grained PAT with Administration Read/Write and Issues Read/Write to properly apply rulesets and labels.)*
+*(Note: CI authenticates as a GitHub App via `app_auth {}` — the `APP_ID`/`APP_PRIVATE_KEY` Actions secrets, not a PAT. See `main.tf`'s provider block.)*
 
 ## Observability (`govern.py`)
 
