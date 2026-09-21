@@ -1,22 +1,10 @@
 {
-  "generated": "2026-09-14 14:56 UTC",
+  "generated": "2026-09-21 15:00 UTC",
   "repos": [
-    {
-      "repo": "kleinbem-site",
-      "visibility": "public",
-      "branches": 2,
-      "open_issues": 0,
-      "stale_branches": 0,
-      "workflows_active": 2,
-      "workflows_disabled": 0,
-      "community_score": 0,
-      "ai_tools": [],
-      "has_description": true
-    },
     {
       "repo": "nix-config",
       "visibility": "public",
-      "branches": 1,
+      "branches": 2,
       "open_issues": 1,
       "stale_branches": 0,
       "workflows_active": 11,
@@ -25,6 +13,45 @@
       "ai_tools": [
         "Claude"
       ],
+      "has_description": true
+    },
+    {
+      "repo": "nix-presets",
+      "visibility": "public",
+      "branches": 2,
+      "open_issues": 0,
+      "stale_branches": 0,
+      "workflows_active": 4,
+      "workflows_disabled": 0,
+      "community_score": 0,
+      "ai_tools": [],
+      "has_description": true
+    },
+    {
+      "repo": "nix",
+      "visibility": "public",
+      "branches": 1,
+      "open_issues": 0,
+      "stale_branches": 0,
+      "workflows_active": 2,
+      "workflows_disabled": 0,
+      "community_score": 25,
+      "ai_tools": [
+        "Antigravity",
+        "Claude"
+      ],
+      "has_description": true
+    },
+    {
+      "repo": "kleinbem-secrets",
+      "visibility": "private",
+      "branches": 1,
+      "open_issues": 0,
+      "stale_branches": 0,
+      "workflows_active": 0,
+      "workflows_disabled": 0,
+      "community_score": 0,
+      "ai_tools": [],
       "has_description": true
     },
     {
@@ -42,7 +69,7 @@
     {
       "repo": "nix-packages",
       "visibility": "public",
-      "branches": 2,
+      "branches": 1,
       "open_issues": 0,
       "stale_branches": 0,
       "workflows_active": 9,
@@ -76,7 +103,7 @@
       "has_description": true
     },
     {
-      "repo": "kleinbem-auth",
+      "repo": "kleinbem-site",
       "visibility": "public",
       "branches": 2,
       "open_issues": 0,
@@ -88,42 +115,15 @@
       "has_description": true
     },
     {
-      "repo": "nix-presets",
+      "repo": "kleinbem-auth",
       "visibility": "public",
-      "branches": 1,
-      "open_issues": 0,
-      "stale_branches": 0,
-      "workflows_active": 4,
-      "workflows_disabled": 0,
-      "community_score": 0,
-      "ai_tools": [],
-      "has_description": true
-    },
-    {
-      "repo": "kleinbem-secrets",
-      "visibility": "private",
-      "branches": 1,
-      "open_issues": 0,
-      "stale_branches": 0,
-      "workflows_active": 0,
-      "workflows_disabled": 0,
-      "community_score": 0,
-      "ai_tools": [],
-      "has_description": true
-    },
-    {
-      "repo": "nix",
-      "visibility": "public",
-      "branches": 1,
+      "branches": 2,
       "open_issues": 0,
       "stale_branches": 0,
       "workflows_active": 2,
       "workflows_disabled": 0,
-      "community_score": 25,
-      "ai_tools": [
-        "Antigravity",
-        "Claude"
-      ],
+      "community_score": 0,
+      "ai_tools": [],
       "has_description": true
     },
     {
@@ -148,6 +148,34 @@
       "workflows_disabled": 0,
       "community_score": 0,
       "ai_tools": [],
+      "has_description": true
+    },
+    {
+      "repo": "openwrt-config",
+      "visibility": "public",
+      "branches": 1,
+      "open_issues": 0,
+      "stale_branches": 0,
+      "workflows_active": 1,
+      "workflows_disabled": 0,
+      "community_score": 0,
+      "ai_tools": [
+        "Antigravity"
+      ],
+      "has_description": true
+    },
+    {
+      "repo": "openwrt-builder",
+      "visibility": "public",
+      "branches": 1,
+      "open_issues": 0,
+      "stale_branches": 0,
+      "workflows_active": 2,
+      "workflows_disabled": 0,
+      "community_score": 0,
+      "ai_tools": [
+        "Antigravity"
+      ],
       "has_description": true
     },
     {
@@ -201,20 +229,6 @@
       "has_description": true
     },
     {
-      "repo": "openwrt-config",
-      "visibility": "public",
-      "branches": 1,
-      "open_issues": 0,
-      "stale_branches": 0,
-      "workflows_active": 1,
-      "workflows_disabled": 0,
-      "community_score": 0,
-      "ai_tools": [
-        "Antigravity"
-      ],
-      "has_description": true
-    },
-    {
       "repo": "kleinbem-actions",
       "visibility": "public",
       "branches": 0,
@@ -224,20 +238,6 @@
       "workflows_disabled": 0,
       "community_score": 0,
       "ai_tools": [],
-      "has_description": true
-    },
-    {
-      "repo": "openwrt-builder",
-      "visibility": "public",
-      "branches": 1,
-      "open_issues": 0,
-      "stale_branches": 0,
-      "workflows_active": 2,
-      "workflows_disabled": 0,
-      "community_score": 0,
-      "ai_tools": [
-        "Antigravity"
-      ],
       "has_description": true
     }
   ]
