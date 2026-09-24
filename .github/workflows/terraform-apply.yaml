@@ -54,11 +54,25 @@ jobs:
         run: |
           tofu plan -input=false -no-color -lock-timeout=120s \
             -out=tfplan -detailed-exitcode 2>&1 | tee plan.txt || ec=$?
-          case "${ec:-0}" in
-            0) echo "has_changes=false" >> "$GITHUB_OUTPUT"; note="✅ No changes — nothing to apply." ;;
-            2) echo "has_changes=true"  >> "$GITHUB_OUTPUT"; note="📝 Changes planned — applying the saved plan below." ;;
-            *) note="❌ Plan errored." ;;
-          esac
+          # -detailed-exitcode is only trustworthy here for ERROR detection
+          # (1) -- its 0-vs-2 "no changes vs changes" distinction turned out
+          # to not reliably return 2 when the plan includes an import-block
+          # action (every repo here is adopted via `import`, never created
+          # out-of-band), even alongside real add/change actions. Confirmed
+          # live: every run since the plan/apply split landed (2026-09-11)
+          # silently skipped `apply` this way, despite plans showing real
+          # pending changes -- exit code stayed 0. Parse the plan's own
+          # printed summary line instead, which is unambiguous regardless
+          # of that exit-code quirk.
+          if [ "${ec:-0}" = "1" ]; then
+            note="❌ Plan errored."
+          elif grep -qE '^(No changes\.|Plan: 0 to import, 0 to add, 0 to change, 0 to destroy\.)' plan.txt; then
+            echo "has_changes=false" >> "$GITHUB_OUTPUT"
+            note="✅ No changes — nothing to apply."
+          else
+            echo "has_changes=true" >> "$GITHUB_OUTPUT"
+            note="📝 Changes planned — applying the saved plan below."
+          fi
           {
             echo "## tofu plan — github-config"
             echo "$note"

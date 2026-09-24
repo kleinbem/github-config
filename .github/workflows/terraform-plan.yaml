@@ -1,10 +1,14 @@
 name: Terraform Plan (drift detection)
 
 # Runs `tofu plan` against the shared R2 state to detect drift between the
-# declared GitHub config and reality (e.g. a setting changed in the UI). Shared
-# state means the signal is exact — `-detailed-exitcode` is 0 (no drift) or
-# 2 (drift). Read-only: this workflow never applies. Apply happens on merge to
-# main (terraform-apply.yaml); `just apply` is the local break-glass path.
+# declared GitHub config and reality (e.g. a setting changed in the UI).
+# `-detailed-exitcode`'s 0-vs-2 distinction is NOT trustworthy when the plan
+# includes an import-block action (every repo here is import-adopted) --
+# confirmed live 2026-09-24: it stayed 0 even with real pending changes. The
+# drift/no-drift call parses the plan's own summary line instead; the exit
+# code is still used, just only to detect a genuine plan error (1). Read-only:
+# this workflow never applies. Apply happens on merge to main
+# (terraform-apply.yaml); `just apply` is the local break-glass path.
 
 on:
   schedule:
@@ -41,11 +45,13 @@ jobs:
         id: plan
         run: |
           tofu plan -input=false -no-color -lock-timeout=120s -detailed-exitcode 2>&1 | tee plan.txt || ec=$?
-          case "${ec:-0}" in
-            0) drift=none;    head="✅ No drift — GitHub matches the declared config." ;;
-            2) drift=changes; head="⚠️ **Drift detected** — see the \`~\`/\`-\`/\`+\` lines below." ;;
-            *) drift=error;   head="❌ Plan errored." ;;
-          esac
+          if [ "${ec:-0}" = "1" ]; then
+            drift=error;   head="❌ Plan errored."
+          elif grep -qE '^(No changes\.|Plan: 0 to import, 0 to add, 0 to change, 0 to destroy\.)' plan.txt; then
+            drift=none;    head="✅ No drift — GitHub matches the declared config."
+          else
+            drift=changes; head="⚠️ **Drift detected** — see the \`~\`/\`-\`/\`+\` lines below."
+          fi
           echo "drift=$drift" >> "$GITHUB_OUTPUT"
           {
             echo "## tofu plan — github-config"
