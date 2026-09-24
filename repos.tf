@@ -97,6 +97,11 @@ locals {
       required_checks = ["check"]
       topics          = ["nixos", "nix-flakes", "nixos-modules", "containers", "nixpak"]
     }
+    "nix-gantry" = {
+      description     = "CI builds once; hosts fetch a manifest and atomically swap in a NixOS/systemd-nspawn container. No evaluation or building on the host."
+      required_checks = ["check"]
+      topics          = ["nixos", "nix-flakes", "nixos-modules", "containers", "systemd"]
+    }
     "nix-hardware" = {
       description     = "A library of NixOS hardware modules."
       required_checks = ["check"]
