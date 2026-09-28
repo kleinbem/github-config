@@ -1,6 +1,6 @@
 # Governance Dashboard
 
-_Generated 2026-09-21 15:00 UTC — read-only report; enforcement lives in Terraform._
+_Generated 2026-09-28 16:40 UTC — read-only report; enforcement lives in Terraform._
 
 | Repo | Vis | Branches | Open issues | Stale | Workflows (✓/✗) | Community | AI |
 |---|---|--:|--:|--:|--|--:|--|
@@ -9,12 +9,13 @@ _Generated 2026-09-21 15:00 UTC — read-only report; enforcement lives in Terra
 | jj-toolbox | public | 1 | 0 | 0 | 0/0 | 0% | — |
 | kleinbem | public | 1 | 0 | 0 | 3/0 | 0% | — |
 | kleinbem-actions | public | 0 | 0 | 0 | 0/0 | 0% | — |
-| kleinbem-auth | public | 2 | 0 | 0 | 2/0 | 0% | — |
+| kleinbem-auth | public | 3 | 0 | 0 | 2/0 | 0% | — |
 | kleinbem-secrets | private | 1 | 0 | 0 | 0/0 | 0% | — |
-| kleinbem-site | public | 2 | 0 | 0 | 2/0 | 0% | — |
+| kleinbem-site | public | 2 | 0 | 0 | 2/0 | 0% | Claude |
 | nix | public | 1 | 0 | 0 | 2/0 | 25% | Antigravity, Claude |
-| nix-config | public | 2 | 1 | 0 | 11/0 | 0% | Claude |
+| nix-config | public | 1 | 1 | 0 | 11/0 | 0% | Claude |
 | nix-devshells | public | 1 | 0 | 0 | 3/0 | 0% | — |
+| nix-gantry | public | 1 | 0 | 0 | 2/0 | 25% | — |
 | nix-hardware | public | 1 | 0 | 0 | 2/0 | 0% | — |
 | nix-packages | public | 1 | 0 | 0 | 9/0 | 0% | — |
 | nix-presets | public | 2 | 0 | 0 | 4/0 | 0% | — |

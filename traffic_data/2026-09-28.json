@@ -1,0 +1,122 @@
+{
+  "nix-config": {
+    "views": 1,
+    "unique_views": 1,
+    "clones": 1777,
+    "unique_clones": 411
+  },
+  "kleinbem-secrets": {
+    "views": 0,
+    "unique_views": 0,
+    "clones": 0,
+    "unique_clones": 0
+  },
+  "nix-presets": {
+    "views": 3,
+    "unique_views": 3,
+    "clones": 630,
+    "unique_clones": 237
+  },
+  "nix": {
+    "views": 0,
+    "unique_views": 0,
+    "clones": 308,
+    "unique_clones": 146
+  },
+  "nix-hardware": {
+    "views": 0,
+    "unique_views": 0,
+    "clones": 262,
+    "unique_clones": 121
+  },
+  "nix-packages": {
+    "views": 0,
+    "unique_views": 0,
+    "clones": 432,
+    "unique_clones": 164
+  },
+  "nix-templates": {
+    "views": 1,
+    "unique_views": 1,
+    "clones": 214,
+    "unique_clones": 90
+  },
+  "nix-devshells": {
+    "views": 0,
+    "unique_views": 0,
+    "clones": 219,
+    "unique_clones": 95
+  },
+  "kleinbem-site": {
+    "views": 0,
+    "unique_views": 0,
+    "clones": 486,
+    "unique_clones": 161
+  },
+  "github-config": {
+    "views": 0,
+    "unique_views": 0,
+    "clones": 8,
+    "unique_clones": 1
+  },
+  "nix-gantry": {
+    "views": 0,
+    "unique_views": 0,
+    "clones": 0,
+    "unique_clones": 0
+  },
+  "kleinbem": {
+    "views": 2,
+    "unique_views": 2,
+    "clones": 105,
+    "unique_clones": 48
+  },
+  "openwrt-config": {
+    "views": 0,
+    "unique_views": 0,
+    "clones": 27,
+    "unique_clones": 16
+  },
+  "openwrt-builder": {
+    "views": 0,
+    "unique_views": 0,
+    "clones": 24,
+    "unique_clones": 11
+  },
+  "nix-toolbox": {
+    "views": 0,
+    "unique_views": 0,
+    "clones": 26,
+    "unique_clones": 19
+  },
+  "jj-toolbox": {
+    "views": 0,
+    "unique_views": 0,
+    "clones": 82,
+    "unique_clones": 50
+  },
+  "kleinbem-auth": {
+    "views": 0,
+    "unique_views": 0,
+    "clones": 202,
+    "unique_clones": 88
+  },
+  ".github": {
+    "views": 0,
+    "unique_views": 0,
+    "clones": 13,
+    "unique_clones": 11
+  },
+  "openwrt": {
+    "views": 0,
+    "unique_views": 0,
+    "clones": 28,
+    "unique_clones": 23
+  },
+  "kleinbem-actions": {
+    "views": 0,
+    "unique_views": 0,
+    "clones": 0,
+    "unique_clones": 0
+  }
+}
