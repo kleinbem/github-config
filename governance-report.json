@@ -1,5 +1,5 @@
 {
-  "generated": "2026-09-28 16:40 UTC",
+  "generated": "2026-10-05 17:13 UTC",
   "repos": [
     {
       "repo": "nix-config",
@@ -16,12 +16,12 @@
       "has_description": true
     },
     {
-      "repo": "kleinbem-secrets",
-      "visibility": "private",
+      "repo": "nix-packages",
+      "visibility": "public",
       "branches": 1,
       "open_issues": 0,
       "stale_branches": 0,
-      "workflows_active": 0,
+      "workflows_active": 10,
       "workflows_disabled": 0,
       "community_score": 0,
       "ai_tools": [],
@@ -40,39 +40,12 @@
       "has_description": true
     },
     {
-      "repo": "nix",
-      "visibility": "public",
-      "branches": 1,
-      "open_issues": 0,
-      "stale_branches": 0,
-      "workflows_active": 2,
-      "workflows_disabled": 0,
-      "community_score": 25,
-      "ai_tools": [
-        "Antigravity",
-        "Claude"
-      ],
-      "has_description": true
-    },
-    {
       "repo": "nix-hardware",
       "visibility": "public",
       "branches": 1,
       "open_issues": 0,
       "stale_branches": 0,
       "workflows_active": 2,
-      "workflows_disabled": 0,
-      "community_score": 0,
-      "ai_tools": [],
-      "has_description": true
-    },
-    {
-      "repo": "nix-packages",
-      "visibility": "public",
-      "branches": 1,
-      "open_issues": 0,
-      "stale_branches": 0,
-      "workflows_active": 9,
       "workflows_disabled": 0,
       "community_score": 0,
       "ai_tools": [],
@@ -103,17 +76,68 @@
       "has_description": true
     },
     {
-      "repo": "kleinbem-site",
+      "repo": "nix",
       "visibility": "public",
-      "branches": 2,
+      "branches": 1,
       "open_issues": 0,
       "stale_branches": 0,
       "workflows_active": 2,
       "workflows_disabled": 0,
+      "community_score": 25,
+      "ai_tools": [
+        "Antigravity",
+        "Claude"
+      ],
+      "has_description": true
+    },
+    {
+      "repo": "kleinbem-secrets",
+      "visibility": "private",
+      "branches": 1,
+      "open_issues": 0,
+      "stale_branches": 0,
+      "workflows_active": 0,
+      "workflows_disabled": 0,
       "community_score": 0,
+      "ai_tools": [],
+      "has_description": true
+    },
+    {
+      "repo": "buzz",
+      "visibility": "public",
+      "branches": 1103,
+      "open_issues": 0,
+      "stale_branches": 4,
+      "workflows_active": 0,
+      "workflows_disabled": 0,
+      "community_score": 75,
       "ai_tools": [
         "Claude"
       ],
+      "has_description": true
+    },
+    {
+      "repo": "nixpkgs",
+      "visibility": "public",
+      "branches": 268,
+      "open_issues": 0,
+      "stale_branches": 114,
+      "workflows_active": 0,
+      "workflows_disabled": 0,
+      "community_score": 25,
+      "ai_tools": [],
+      "has_description": true
+    },
+    {
+      "repo": "nix-gantry",
+      "visibility": "public",
+      "branches": 1,
+      "open_issues": 0,
+      "stale_branches": 0,
+      "workflows_active": 2,
+      "workflows_disabled": 0,
+      "community_score": 25,
+      "ai_tools": [],
       "has_description": true
     },
     {
@@ -129,15 +153,17 @@
       "has_description": true
     },
     {
-      "repo": "nix-gantry",
+      "repo": "kleinbem-site",
       "visibility": "public",
-      "branches": 1,
+      "branches": 3,
       "open_issues": 0,
       "stale_branches": 0,
       "workflows_active": 2,
       "workflows_disabled": 0,
-      "community_score": 25,
-      "ai_tools": [],
+      "community_score": 0,
+      "ai_tools": [
+        "Claude"
+      ],
       "has_description": true
     },
     {
