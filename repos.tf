@@ -72,6 +72,10 @@ locals {
       description     = "nix-config"
       required_checks = ["check"]
       topics          = ["nixos", "nix-flakes", "homelab", "home-manager", "nixos-config"]
+      extra_labels = {
+        # Filed by the daily Vaultwarden version-drift watcher.
+        "vaultwarden-version" = { color = "BFD4F2", description = "Auto-filed: shipped Vaultwarden is behind upstream" }
+      }
     }
     "nix-packages" = {
       description     = "Nix User Repository (NUR)"
@@ -129,10 +133,18 @@ locals {
       description     = "kleinbem.dev — personal site (Astro + Svelte + Tailwind)"
       required_checks = ["build"] # job name in kleinbem-site/.github/workflows/ci.yaml
       topics          = ["astro", "svelte", "tailwindcss", "personal-website"]
+      extra_labels = {
+        # Created by Dependabot for its npm update PRs.
+        "javascript" = { color = "168700", description = "Pull requests that update javascript code" }
+      }
     }
     "kleinbem-auth" = {
       description = "Self-hosted auth (better-auth) for kleinbem.dev — Google/Facebook/etc. login for site visitors"
       topics      = ["better-auth", "nodejs", "sqlite", "oauth"]
+    }
+    "skills" = {
+      description = "Agent skills (Claude Code plugin marketplace): nixpkgs contributions, kleinbem fleet"
+      topics      = ["claude-code", "agent-skills", "nixpkgs"]
     }
   }
 
