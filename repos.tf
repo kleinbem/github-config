@@ -146,6 +146,10 @@ locals {
       description = "Agent skills (Claude Code plugin marketplace): nixpkgs contributions, kleinbem fleet"
       topics      = ["claude-code", "agent-skills", "nixpkgs"]
     }
+    "mesh-llm-ci" = {
+      description = "Run Mesh-LLM crate checks and tests on GitHub's Windows and macOS runners for any fork commit, before opening an upstream PR."
+      topics      = ["mesh-llm", "github-actions", "ci"]
+    }
   }
 
   repos = {
