@@ -150,6 +150,11 @@ locals {
       description = "Run Mesh-LLM crate checks and tests on GitHub's Windows and macOS runners for any fork commit, before opening an upstream PR."
       topics      = ["mesh-llm", "github-actions", "ci"]
     }
+    "chrome-open-in-app" = {
+      description     = "Move browser tabs into standalone PWA/app windows (Chrome extension + Go native host)"
+      required_checks = ["Lint, Test & Validate"] # job name in .github/workflows/ci.yaml
+      topics          = ["chrome-extension", "pwa", "native-messaging", "golang"]
+    }
   }
 
   repos = {
