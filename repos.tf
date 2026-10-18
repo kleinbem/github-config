@@ -150,6 +150,14 @@ locals {
       description = "Run Mesh-LLM crate checks and tests on GitHub's Windows and macOS runners for any fork commit, before opening an upstream PR."
       topics      = ["mesh-llm", "github-actions", "ci"]
     }
+    # GPU tests of nixpkgs' mesh-llm on the Orin's self-hosted runner. Private:
+    # a self-hosted runner must never take jobs from a public repo's PRs.
+    "mesh-llm-gpu" = {
+      description      = "GPU tests of nixpkgs' mesh-llm on a self-hosted Jetson runner (the GPU half of the nix-packages canary)."
+      visibility       = "private"
+      allow_auto_merge = false
+      topics           = ["mesh-llm", "github-actions", "ci", "cuda"]
+    }
     "chrome-open-in-app" = {
       description     = "Move browser tabs into standalone PWA/app windows (Chrome extension + Go native host)"
       required_checks = ["Lint, Test & Validate"] # job name in .github/workflows/ci.yaml
