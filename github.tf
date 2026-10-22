@@ -111,7 +111,12 @@ resource "github_repository_ruleset" "main" {
     dynamic "required_status_checks" {
       for_each = length(each.value.required_checks) > 0 ? [1] : []
       content {
-        strict_required_status_checks_policy = true
+        # Not strict: GitHub auto-merge never updates a PR that fell behind
+        # main, and main moves several times a day (docs syncs, lock bumps), so
+        # strict mode left armed PRs stuck BEHIND. A green PR merges as is;
+        # main's own CI (and nix-config's promote gate before any device)
+        # catches the rare pair of PRs that only break together.
+        strict_required_status_checks_policy = false
         dynamic "required_check" {
           for_each = each.value.required_checks
           content {

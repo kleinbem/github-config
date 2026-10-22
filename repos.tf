@@ -53,8 +53,14 @@ locals {
       description = "OpenWrt meta-workspace — tooling orchestrator for router firmware, config, and secrets"
       topics      = ["openwrt", "ansible", "infrastructure-as-code", "homelab", "monorepo", "jujutsu"]
     }
-    "openwrt-builder" = { description = "OpenWrt image builder" }
-    "openwrt-config"  = { description = "Managing OpenWRT network" }
+    "openwrt-builder" = {
+      description     = "OpenWrt image builder"
+      required_checks = ["validate"] # job in build.yml; the build-firmware matrix names change per profile
+    }
+    "openwrt-config" = {
+      description     = "Managing OpenWRT network"
+      required_checks = ["lint"] # job name in .github/workflows/ci.yaml
+    }
     # openwrt-secrets deleted 2026-08-08 — fully replaced by kleinbem-secrets
     # (content migrated, every consumer repointed). Local backup kept at
     # ../openwrt-secrets.deleted.
@@ -89,6 +95,8 @@ locals {
       extra_labels = {
         "automated"   = { color = "ededed", description = "Opened automatically by a bot workflow" }
         "antigravity" = { color = "ededed", description = "Antigravity IDE/CLI update PRs" }
+        # Created by Dependabot for its GitHub Actions update PRs.
+        "github_actions" = { color = "000000", description = "Pull requests that update GitHub Actions code" }
       }
     }
     "nix-devshells" = {
@@ -139,8 +147,9 @@ locals {
       }
     }
     "kleinbem-auth" = {
-      description = "Self-hosted auth (better-auth) for kleinbem.dev — Google/Facebook/etc. login for site visitors"
-      topics      = ["better-auth", "nodejs", "sqlite", "oauth"]
+      description     = "Self-hosted auth (better-auth) for kleinbem.dev — Google/Facebook/etc. login for site visitors"
+      required_checks = ["build"] # job name in .github/workflows/ci.yml
+      topics          = ["better-auth", "nodejs", "sqlite", "oauth"]
     }
     "skills" = {
       description = "Agent skills (Claude Code plugin marketplace): nixpkgs contributions, kleinbem fleet"
