@@ -172,6 +172,10 @@ locals {
       required_checks = ["Lint, Test & Validate"] # job name in .github/workflows/ci.yaml
       topics          = ["chrome-extension", "pwa", "native-messaging", "golang"]
     }
+    "aur-packages" = {
+      description = "Arch Linux PKGBUILDs for the AUR, built and checked in clean containers."
+      topics      = ["archlinux", "aur", "pkgbuild"]
+    }
   }
 
   repos = {
