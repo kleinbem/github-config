@@ -176,6 +176,32 @@ locals {
       description = "Arch Linux PKGBUILDs for the AUR, built and checked in clean containers."
       topics      = ["archlinux", "aur", "pkgbuild"]
     }
+    # Adopted 2026-10-24: these four were created out-of-band and never
+    # declared here, so they sat on GitHub's defaults — no auto-merge, no
+    # delete-branch-on-merge, merge commits and rebase merges allowed, no
+    # ruleset. None has CI yet, so no required_checks.
+    "jj-toolbox" = {
+      description = "Portable jj (Jujutsu) helpers"
+      topics      = ["jujutsu", "jj", "git", "cli"]
+    }
+    "nix-toolbox" = {
+      description = "Portable Nix flake dev-workflow tools"
+      topics      = ["nix", "nix-flakes", "cli"]
+    }
+    "android-config" = {
+      description = "Declarative Android fleet configuration, ADB tuning, and Termux management"
+      topics      = ["android", "adb", "termux", "homelab"]
+    }
+    ".github" = {
+      description = "Org profile README for the kleinbem fleet"
+    }
+    # Shared composite actions (nix-setup), consumed by sha pin from every
+    # nix repo. Renamed from the empty kleinbem-actions placeholder.
+    "actions" = {
+      description     = "Shared GitHub Actions for the kleinbem repos (nix-setup: Determinate Nix + mesh-only Attic cache)"
+      required_checks = ["actionlint", "smoke"] # jobs in .github/workflows/ci.yaml
+      topics          = ["github-actions", "composite-action", "nix", "ci"]
+    }
   }
 
   repos = {
