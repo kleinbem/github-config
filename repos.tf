@@ -152,8 +152,9 @@ locals {
       topics          = ["better-auth", "nodejs", "sqlite", "oauth"]
     }
     "skills" = {
-      description = "Agent skills (Claude Code plugin marketplace): nixpkgs contributions, kleinbem fleet"
-      topics      = ["claude-code", "agent-skills", "nixpkgs"]
+      description     = "Agent skills (Claude Code plugin marketplace): nixpkgs contributions, kleinbem fleet"
+      required_checks = ["check"] # job name in .github/workflows/ci.yaml
+      topics          = ["claude-code", "agent-skills", "nixpkgs"]
     }
     "mesh-llm-ci" = {
       description = "Run Mesh-LLM crate checks and tests on GitHub's Windows and macOS runners for any fork commit, before opening an upstream PR."
