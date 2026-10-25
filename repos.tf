@@ -199,7 +199,7 @@ locals {
     # nix repo. Renamed from the empty kleinbem-actions placeholder.
     "actions" = {
       description     = "Shared GitHub Actions for the kleinbem repos (nix-setup: Determinate Nix + mesh-only Attic cache)"
-      required_checks = ["actionlint", "smoke"] # jobs in .github/workflows/ci.yaml
+      required_checks = ["actionlint", "smoke", "smoke-full", "smoke-arm"] # jobs in .github/workflows/ci.yaml
       topics          = ["github-actions", "composite-action", "nix", "ci"]
     }
   }
