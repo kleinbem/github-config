@@ -68,11 +68,9 @@ locals {
     # nix meta-workspace repos (config here; their Actions secrets live in nix/terraform).
     # Public ones get portfolio topics so they surface in GitHub search/discovery.
     "nix" = {
-      description = "nix workspace"
-      # No required_checks: this repo's CI was retired in the meta-flake →
-      # nix-config migration (7df6612) — build-all/security-audit now live
-      # in nix-config, and "nix" itself has no workflows left to gate on.
-      topics = ["nixos", "nix-flakes", "infrastructure-as-code", "homelab", "monorepo", "jujutsu"]
+      description     = "nix workspace"
+      required_checks = ["check"] # job name in .github/workflows/ci.yaml (infra/ + tools/ checks)
+      topics          = ["nixos", "nix-flakes", "infrastructure-as-code", "homelab", "monorepo", "jujutsu"]
     }
     "nix-config" = {
       description     = "nix-config"
