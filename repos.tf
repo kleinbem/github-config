@@ -104,6 +104,11 @@ locals {
       required_checks = ["check"]
       topics          = ["nixos", "nix-flakes", "devenv", "dev-shells"]
     }
+    "nix-holds" = {
+      description     = "Packages the kleinbem fleet holds back from nixos-unstable, with release and alert workflows"
+      required_checks = ["check"]
+      topics          = ["nixos", "nix-flakes", "nixpkgs"]
+    }
     "nix-presets" = {
       description     = "Reusable NixOS modules, hardened security policies, and Nixpak sandboxes."
       required_checks = ["check"]
