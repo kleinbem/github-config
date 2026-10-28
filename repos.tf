@@ -171,6 +171,11 @@ locals {
       allow_auto_merge = false
       topics           = ["mesh-llm", "github-actions", "ci", "cuda"]
     }
+    "mesh-agents" = {
+      description     = "Private, self-hosted AI agents that share compute across your devices."
+      required_checks = ["check"]
+      topics          = ["nixos", "nix-flakes", "nixos-modules", "ai-agents", "llm", "local-llm", "self-hosted", "mesh-llm", "goose"]
+    }
     "chrome-open-in-app" = {
       description     = "Move browser tabs into standalone PWA/app windows (Chrome extension + Go native host)"
       required_checks = ["Lint, Test & Validate"] # job name in .github/workflows/ci.yaml
@@ -205,6 +210,10 @@ locals {
       description     = "Shared GitHub Actions for the kleinbem repos (nix-setup: Determinate Nix + mesh-only Attic cache)"
       required_checks = ["actionlint", "smoke", "smoke-full", "smoke-arm"] # jobs in .github/workflows/ci.yaml
       topics          = ["github-actions", "composite-action", "nix", "ci"]
+      extra_labels = {
+        # Created by Dependabot for its GitHub Actions update PRs.
+        "github_actions" = { color = "000000", description = "Pull requests that update GitHub Actions code" }
+      }
     }
   }
 
