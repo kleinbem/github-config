@@ -1,8 +1,8 @@
 # GitHub Governance & Configuration
 
 Single source of truth for **all** owned `kleinbem` repos' GitHub config
-(settings, rulesets, labels, security). This repo is **private**, so it safely
-declares private repos too. The [`nix`](https://github.com/kleinbem/nix)
+(settings, rulesets, labels, security), private repos included. It holds no
+secrets: state lives in R2, credentials in Actions secrets. The [`nix`](https://github.com/kleinbem/nix)
 meta-repo's `terraform/` owns only the Actions **secret** distribution for its
 CI repos (those values come from sops). Two halves here:
 

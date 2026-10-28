@@ -2,8 +2,8 @@
 
 Single source of truth for every owned `kleinbem` repo's GitHub settings,
 branch-protection rulesets, standard labels, and security config (secret
-scanning + Dependabot). Private repo, so it can safely declare private repos
-too.
+scanning + Dependabot). Public repo: it holds no secrets (state in R2,
+credentials in Actions secrets), only repo names and settings.
 
 ## Layout
 
