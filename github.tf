@@ -17,6 +17,7 @@ resource "github_repository" "this" {
   name        = each.key
   description = each.value.description
   visibility  = each.value.visibility
+  archived    = each.value.archived
 
   has_issues   = each.value.has_issues
   has_wiki     = each.value.has_wiki
