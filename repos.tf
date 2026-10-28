@@ -1,7 +1,7 @@
 # ---------------------------------------------------------------------------
 # Single source of truth for ALL owned kleinbem repos' GitHub config (settings,
-# rulesets, labels, security). This repo is PRIVATE, so it safely declares
-# private repos too.
+# rulesets, labels, security). Public since 2026-10-28: it holds no secrets
+# (state in R2, credentials in Actions secrets), only repo names and settings.
 #
 # Split of responsibility: this repo owns repo *config*; the nix meta-workspace's
 # terraform/ owns only the Actions *secret* distribution for its CI repos (those
@@ -36,14 +36,9 @@ locals {
   }
 
   repo_overrides = {
-    # allow_auto_merge: GitHub silently won't persist this as true on private
-    # repos on this account's plan (PATCH returns 200 but the field reverts) —
-    # declaring false here matches reality so `tofu plan` stops reporting
-    # permanent phantom drift. Same override on kleinbem-secrets below.
     "github-config" = {
-      description      = "Declarative GitHub-as-code: repo settings, rulesets, labels (Terraform) + governance reporting"
-      visibility       = "private"
-      allow_auto_merge = false
+      description     = "Declarative GitHub-as-code: repo settings, rulesets, labels (Terraform) + governance reporting"
+      required_checks = ["plan"] # job in terraform-plan.yaml; fails only on a plan error
     }
     "kleinbem" = { description = "It's me!" }
     # openwrt meta-workspace repos (mirrors the nix meta-workspace layout).
@@ -133,8 +128,10 @@ locals {
     #
     # Single sops-encrypted vault for the whole fleet — nix, openwrt,
     # CI/infra, personas. See its own README.md for the design rationale.
-    # allow_auto_merge: see github-config's override above — same
-    # non-persisting-on-private-repos behavior applies here too.
+    # allow_auto_merge: GitHub silently won't persist this as true on private
+    # repos on this account's plan (PATCH returns 200 but the field reverts) —
+    # declaring false here matches reality so `tofu plan` stops reporting
+    # permanent phantom drift. Same on mesh-llm-gpu below.
     "kleinbem-secrets" = {
       description      = "Single encrypted secrets vault for the kleinbem workspace family (nix, openwrt, CI/infra, personas)"
       visibility       = "private"
