@@ -34,9 +34,10 @@ locals {
     web_commit_signoff_required = true # DCO sign-off for any web-UI commits
     ruleset                     = true
     required_checks             = []
-    bypass_apps                 = [] # list of GitHub App installation IDs for ruleset bypass (e.g. lockfile-autopilot)
-    topics                      = [] # per-repo overrides via repo_overrides
-    extra_labels                = {} # per-repo labels on top of standard_labels (see nix-packages)
+    coderabbit                  = true # require the CodeRabbit review (modules/repos)
+    bypass_apps                 = []   # list of GitHub App installation IDs for ruleset bypass (e.g. lockfile-autopilot)
+    topics                      = []   # per-repo overrides via repo_overrides
+    extra_labels                = {}   # per-repo labels on top of standard_labels (see nix-packages)
   }
 
   repo_overrides = {
@@ -231,6 +232,7 @@ locals {
     "nix-gantry" = {
       description     = "CI builds once; hosts fetch a manifest and atomically swap in a NixOS/systemd-nspawn container. No evaluation or building on the host."
       required_checks = ["check"]
+      coderabbit      = false # CodeRabbit isn't installed on kleinbem-dev yet
       topics          = ["nixos", "nix-flakes", "nixos-modules", "containers", "systemd"]
       extra_labels = {
         # Created by Dependabot for its GitHub Actions update PRs.
