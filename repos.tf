@@ -223,11 +223,18 @@ locals {
   # user account above. Same defaults; GitHub keeps redirects from the old
   # kleinbem/<repo> URLs as long as nothing reuses the name there.
   org_repo_overrides = {
+    # Central CodeRabbit config for the org: CodeRabbit only reads it from a
+    # `coderabbit` repo in the same org. A copy of kleinbem/coderabbit; keep
+    # the two in step.
+    "coderabbit" = {
+      description     = "Central CodeRabbit review config for every kleinbem-dev repo"
+      required_checks = ["validate"] # job in .github/workflows/validate.yaml
+      topics          = ["coderabbit", "code-review"]
+    }
     # Renders the org profile (profile/README.md); it never rendered on the
     # user account. Transferred 2026-10-29.
     ".github" = {
       description = "Profile README of the kleinbem-dev organization"
-      coderabbit  = false # CodeRabbit isn't installed on kleinbem-dev yet
     }
     # Transferred 2026-10-29. The transfer switched secret scanning and push
     # protection off and dropped the ruleset's admin bypass; the first plan
@@ -235,7 +242,6 @@ locals {
     "nix-gantry" = {
       description     = "CI builds once; hosts fetch a manifest and atomically swap in a NixOS/systemd-nspawn container. No evaluation or building on the host."
       required_checks = ["check"]
-      coderabbit      = false # CodeRabbit isn't installed on kleinbem-dev yet
       topics          = ["nixos", "nix-flakes", "nixos-modules", "containers", "systemd"]
       extra_labels = {
         # Created by Dependabot for its GitHub Actions update PRs.
