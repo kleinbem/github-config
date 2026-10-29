@@ -18,7 +18,8 @@ import sys
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
-OWNER = "kleinbem"
+# Every owner github-config manages: the user account and the kleinbem-dev org.
+OWNERS = ["kleinbem", "kleinbem-dev"]
 STALE_DAYS = 180
 COMMUNITY_FILES = ["CONTRIBUTING.md", "CODE_OF_CONDUCT.md", "CODEOWNERS", "SECURITY.md"]
 AI_MARKERS = {".agent": "Antigravity", ".claude": "Claude", ".cursorrules": "Cursor", ".gemini": "Gemini"}
@@ -44,8 +45,11 @@ def gh_json(*args: str, default=None):
 
 
 def repos() -> list[dict]:
-    return gh_json("repo", "list", OWNER, "--no-archived", "--limit", "1000",
-                   "--json", "name,nameWithOwner,visibility,description,defaultBranchRef", default=[]) or []
+    found: list[dict] = []
+    for owner in OWNERS:
+        found += gh_json("repo", "list", owner, "--no-archived", "--limit", "1000",
+                         "--json", "name,nameWithOwner,visibility,description,defaultBranchRef", default=[]) or []
+    return found
 
 
 def stale_branch_count(full: str) -> int:
@@ -87,7 +91,7 @@ def report() -> None:
         counts = gh_json("api", "graphql", "-f", (
             'query={repository(owner:"%s",name:"%s"){'
             'refs(refPrefix:"refs/heads/"){totalCount} issues(states:OPEN){totalCount}}}'
-        ) % (OWNER, r["name"]), default={}) or {}
+        ) % tuple(full.split("/", 1)), default={}) or {}
         repo = (counts.get("data") or {}).get("repository") or {}
         active, disabled = workflow_counts(full)
         rows.append({

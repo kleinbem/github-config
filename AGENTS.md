@@ -10,7 +10,8 @@ credentials in Actions secrets), only repo names and settings.
 | Path | What lives here |
 |---|---|
 | `repos.tf` | Declares every managed repo + its settings. |
-| `github.tf` | Rulesets, labels, and other shared resources. |
+| `github.tf` | One `modules/repos` instance per owner (kleinbem user, kleinbem-dev org), imports, `moved` blocks. |
+| `modules/repos/` | The per-repo resources: settings, security, ruleset, Actions policy, labels. |
 | `backend.tf` | Cloudflare R2 Terraform state backend. |
 | `variables.tf` | Provider auth + shared variables. |
 | `scripts/govern.py` | Read-only observability — regenerates `DASHBOARD.md` + `governance-report.json`. |
