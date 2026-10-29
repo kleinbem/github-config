@@ -52,6 +52,10 @@ jobs:
       - name: tofu plan
         id: plan
         run: |
+          # Without pipefail the pipeline's status is tee's, never tofu's, so
+          # `ec` stayed unset and an errored plan counted as "changes" (seen
+          # 2026-10-29: a provider auth error, check green).
+          set -o pipefail
           tofu plan -input=false -no-color -lock-timeout=120s \
             -out=tfplan -detailed-exitcode 2>&1 | tee plan.txt || ec=$?
           # -detailed-exitcode is only trustworthy here for ERROR detection
