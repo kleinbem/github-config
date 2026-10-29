@@ -111,11 +111,6 @@ locals {
       required_checks = ["check"]
       topics          = ["nixos", "nix-flakes", "nixos-modules", "containers", "nixpak"]
     }
-    "nix-gantry" = {
-      description     = "CI builds once; hosts fetch a manifest and atomically swap in a NixOS/systemd-nspawn container. No evaluation or building on the host."
-      required_checks = ["check"]
-      topics          = ["nixos", "nix-flakes", "nixos-modules", "containers", "systemd"]
-    }
     "nix-hardware" = {
       description     = "A library of NixOS hardware modules."
       required_checks = ["check"]
@@ -222,6 +217,30 @@ locals {
 
   repos = {
     for name, ov in local.repo_overrides : name => merge(local.repo_defaults, ov)
+  }
+
+  # Repos under the kleinbem-dev organization (display name kleinbem.dev):
+  # projects built for others, moved there once they have a license, a README
+  # for strangers and CI. The fleet and everything personal stays under the
+  # user account above. Same defaults; GitHub keeps redirects from the old
+  # kleinbem/<repo> URLs as long as nothing reuses the name there.
+  org_repo_overrides = {
+    # Transferred 2026-10-29. The transfer switched secret scanning and push
+    # protection off and dropped the ruleset's admin bypass; the first plan
+    # on the org put both back.
+    "nix-gantry" = {
+      description     = "CI builds once; hosts fetch a manifest and atomically swap in a NixOS/systemd-nspawn container. No evaluation or building on the host."
+      required_checks = ["check"]
+      topics          = ["nixos", "nix-flakes", "nixos-modules", "containers", "systemd"]
+      extra_labels = {
+        # Created by Dependabot for its GitHub Actions update PRs.
+        "github_actions" = { color = "000000", description = "Pull requests that update GitHub Actions code" }
+      }
+    }
+  }
+
+  org_repos = {
+    for name, ov in local.org_repo_overrides : name => merge(local.repo_defaults, ov)
   }
 
   # Standard label set (migrated from labels.yaml). Same set the nix config uses.

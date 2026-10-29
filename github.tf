@@ -1,170 +1,93 @@
 # ---------------------------------------------------------------------------
 # Declarative config for the general kleinbem repos. Replaces the old
 # audit_repos.py / sync_labels.py enforcement scripts with drift-free HCL.
-# Repo map + labels live in repos.tf.
+# Repo maps + labels live in repos.tf; the per-repo resources in
+# modules/repos, instantiated once per owner below.
 # ---------------------------------------------------------------------------
 
 # Adopt existing repos (import, never create); prevent_destroy guards them.
 import {
   for_each = local.repos
-  to       = github_repository.this[each.key]
+  to       = module.user.github_repository.this[each.key]
   id       = each.key
 }
 
-resource "github_repository" "this" {
-  for_each = local.repos
+import {
+  for_each = local.org_repos
+  to       = module.org.github_repository.this[each.key]
+  id       = each.key
+}
 
-  name        = each.key
-  description = each.value.description
-  visibility  = each.value.visibility
-  archived    = each.value.archived
+# The kleinbem user account: the fleet and everything personal.
+module "user" {
+  source          = "./modules/repos"
+  repos           = local.repos
+  standard_labels = local.standard_labels
+}
 
-  has_issues   = each.value.has_issues
-  has_wiki     = each.value.has_wiki
-  has_projects = each.value.has_projects
-
-  allow_squash_merge     = each.value.allow_squash_merge
-  allow_merge_commit     = each.value.allow_merge_commit
-  allow_rebase_merge     = each.value.allow_rebase_merge
-  allow_auto_merge       = each.value.allow_auto_merge
-  allow_update_branch    = each.value.allow_update_branch
-  delete_branch_on_merge = each.value.delete_branch_on_merge
-
-  # Clean squash commits: PR title as subject, PR body as the message.
-  squash_merge_commit_title   = each.value.squash_merge_title
-  squash_merge_commit_message = each.value.squash_merge_message
-
-  # DCO-style sign-off required for any commits made via the GitHub web UI.
-  # Has no effect on git-pushed commits — those are governed by the ruleset
-  # below (required_signatures).
-  web_commit_signoff_required = each.value.web_commit_signoff_required
-
-  # Portfolio discoverability — topics make public repos surface in GitHub
-  # search + tag-based browsing. Empty list = no topics.
-  topics = each.value.topics
-
-  # Secret scanning + push protection are free on public repos; private repos
-  # need GitHub Advanced Security, so only enable on public ones.
-  dynamic "security_and_analysis" {
-    for_each = each.value.visibility == "public" ? [1] : []
-    content {
-      secret_scanning {
-        status = "enabled"
-      }
-      secret_scanning_push_protection {
-        status = "enabled"
-      }
-    }
-  }
-
-  lifecycle {
-    prevent_destroy = true
-    # template: create-time-only provenance (which template repo a repo was
-    # generated from, e.g. nix-packages <- nix-community/nur-packages-template).
-    # GitHub has no API to clear it post-creation, so it's not something
-    # repos.tf ever declares — ignore it so tofu plan stops proposing the
-    # same never-applicable removal on every run.
-    ignore_changes = [template]
+# The kleinbem-dev organization: projects meant for others (see repos.tf).
+module "org" {
+  source          = "./modules/repos"
+  repos           = local.org_repos
+  standard_labels = local.standard_labels
+  providers = {
+    github = github.org
   }
 }
 
-# Vulnerability alerts per repository (replaces deprecated in-resource attribute).
-resource "github_repository_vulnerability_alerts" "this" {
-  for_each   = { for k, v in local.repos : k => v if v.vulnerability_alerts }
-  repository = github_repository.this[each.key].name
-  enabled    = true
+# 2026-10-29: the resources moved from the root into module.user unchanged;
+# these keep the state entries, so the move plans as a no-op.
+moved {
+  from = github_repository.this
+  to   = module.user.github_repository.this
+}
+moved {
+  from = github_repository_vulnerability_alerts.this
+  to   = module.user.github_repository_vulnerability_alerts.this
+}
+moved {
+  from = github_repository_dependabot_security_updates.this
+  to   = module.user.github_repository_dependabot_security_updates.this
+}
+moved {
+  from = github_repository_ruleset.main
+  to   = module.user.github_repository_ruleset.main
+}
+moved {
+  from = github_actions_repository_permissions.this
+  to   = module.user.github_actions_repository_permissions.this
+}
+moved {
+  from = github_issue_labels.this
+  to   = module.user.github_issue_labels.this
 }
 
-# Dependabot automated security fixes (free for all repos; needs vuln alerts).
-resource "github_repository_dependabot_security_updates" "this" {
-  for_each = local.repos
-
-  repository = github_repository.this[each.key].name
-  enabled    = true
+# A repo transferred from the user account to the org keeps its GitHub ids
+# (ruleset included), so its state entries move across too instead of being
+# forgotten and re-imported. One block per resource and repo; the transfer
+# itself is a manual step (`gh api -X POST repos/kleinbem/<repo>/transfer
+# -f new_owner=kleinbem-dev`), done before this moves.
+moved {
+  from = module.user.github_repository.this["nix-gantry"]
+  to   = module.org.github_repository.this["nix-gantry"]
 }
-
-# Default-branch guardrails: block deletion + force-push, admin (you) bypasses
-# so direct push to the default branch still works. Rulesets are free for public repos.
-resource "github_repository_ruleset" "main" {
-  for_each = { for n, c in local.repos : n => c if c.ruleset && c.visibility == "public" }
-
-  name        = "default-branch-guardrails"
-  repository  = each.key
-  target      = "branch"
-  enforcement = "active"
-
-  conditions {
-    ref_name {
-      include = ["~DEFAULT_BRANCH"]
-      exclude = []
-    }
-  }
-
-  rules {
-    deletion                = true
-    non_fast_forward        = true
-    required_linear_history = true
-    # Require GPG/SSH signature on every commit landing on the default branch.
-    # Paired with jj's `signing.behavior = "own"` + the V2 SSH-FIDO NoTouch key,
-    # this is touchless. See nix-presets/git.nix for the jj-side config.
-    required_signatures = true
-
-    dynamic "required_status_checks" {
-      for_each = length(each.value.required_checks) > 0 ? [1] : []
-      content {
-        # Not strict: GitHub auto-merge never updates a PR that fell behind
-        # main, and main moves several times a day (docs syncs, lock bumps), so
-        # strict mode left armed PRs stuck BEHIND. A green PR merges as is;
-        # main's own CI (and nix-config's promote gate before any device)
-        # catches the rare pair of PRs that only break together.
-        strict_required_status_checks_policy = false
-        dynamic "required_check" {
-          for_each = each.value.required_checks
-          content {
-            context = required_check.value
-          }
-        }
-      }
-    }
-  }
-
-  bypass_actors {
-    actor_id    = 5 # Repository admin role
-    actor_type  = "RepositoryRole"
-    bypass_mode = "always"
-  }
-
-  dynamic "bypass_actors" {
-    for_each = each.value.bypass_apps
-    content {
-      actor_id    = bypass_actors.value
-      actor_type  = "Integration"
-      bypass_mode = "always"
-    }
-  }
-
-  depends_on = [github_repository.this]
+moved {
+  from = module.user.github_repository_vulnerability_alerts.this["nix-gantry"]
+  to   = module.org.github_repository_vulnerability_alerts.this["nix-gantry"]
 }
-
-# GitHub Actions permissions policy (authoritative per repo).
-resource "github_actions_repository_permissions" "this" {
-  for_each        = local.repos
-  repository      = github_repository.this[each.key].name
-  allowed_actions = "all"
+moved {
+  from = module.user.github_repository_dependabot_security_updates.this["nix-gantry"]
+  to   = module.org.github_repository_dependabot_security_updates.this["nix-gantry"]
 }
-
-# Standard label set, authoritative per repo (handles GitHub's default labels
-# without per-label imports; reconciles to exactly this set).
-resource "github_issue_labels" "this" {
-  for_each   = local.repos
-  repository = github_repository.this[each.key].name
-
-  dynamic "label" {
-    for_each = merge(local.standard_labels, each.value.extra_labels)
-    content {
-      name        = label.key
-      color       = label.value.color
-      description = label.value.description
-    }
-  }
+moved {
+  from = module.user.github_repository_ruleset.main["nix-gantry"]
+  to   = module.org.github_repository_ruleset.main["nix-gantry"]
+}
+moved {
+  from = module.user.github_actions_repository_permissions.this["nix-gantry"]
+  to   = module.org.github_actions_repository_permissions.this["nix-gantry"]
+}
+moved {
+  from = module.user.github_issue_labels.this["nix-gantry"]
+  to   = module.org.github_issue_labels.this["nix-gantry"]
 }

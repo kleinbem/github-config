@@ -13,6 +13,9 @@ inputs:
   app-installation-id:
     required: true
     description: GitHub App installation ID on the kleinbem account (APP_INSTALLATION_ID secret).
+  app-org-installation-id:
+    required: true
+    description: GitHub App installation ID on the kleinbem-dev organization (APP_ORG_INSTALLATION_ID secret).
   app-private-key:
     required: true
     description: GitHub App private key, PEM contents (APP_PRIVATE_KEY secret).
@@ -27,6 +30,7 @@ runs:
       env:
         APP_ID: ${{ inputs.app-id }}
         APP_INSTALLATION_ID: ${{ inputs.app-installation-id }}
+        APP_ORG_INSTALLATION_ID: ${{ inputs.app-org-installation-id }}
         APP_PRIVATE_KEY: ${{ inputs.app-private-key }}
       run: |
         # provider `app_auth {}` reads these; pem_file takes the PEM contents,
@@ -34,6 +38,7 @@ runs:
         {
           echo "TF_VAR_github_app_id=$APP_ID"
           echo "TF_VAR_github_app_installation_id=$APP_INSTALLATION_ID"
+          echo "TF_VAR_github_app_org_installation_id=$APP_ORG_INSTALLATION_ID"
           echo "TF_VAR_github_app_pem<<__PEM_EOF__"
           printf '%s\n' "$APP_PRIVATE_KEY"
           echo "__PEM_EOF__"
