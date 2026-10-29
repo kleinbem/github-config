@@ -20,13 +20,28 @@ terraform {
 #
 # The App only needs Administration R/W + Issues R/W + Metadata R on the managed
 # repos — repo *creation* is out of scope (Apps can't create repos on a user
-# account; new repos are created out-of-band and adopted by the import block in
-# github.tf).
+# account; new repos are created out-of-band and adopted by the import blocks in
+# github.tf). Org repos could be created by the App, but stay adopt-only too so
+# both owners work the same way.
 provider "github" {
   owner = "kleinbem"
   app_auth {
     id              = var.github_app_id
     installation_id = var.github_app_installation_id
+    pem_file        = var.github_app_pem
+  }
+}
+
+# Same App, installed a second time on the kleinbem-dev organization. An
+# installation is per account, so the org needs its own installation id (the
+# App id and key are shared). Repos under the org are listed in
+# local.org_repos (repos.tf).
+provider "github" {
+  alias = "org"
+  owner = "kleinbem-dev"
+  app_auth {
+    id              = var.github_app_id
+    installation_id = var.github_app_org_installation_id
     pem_file        = var.github_app_pem
   }
 }

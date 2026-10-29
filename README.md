@@ -16,7 +16,9 @@ on the `archive/script-era-wip` branch).
 
 ## Enforcement (Terraform)
 
-Repos and their settings are declared in `repos.tf`; resources in `github.tf`.
+Repos and their settings are declared in `repos.tf` (`repo_overrides` for the kleinbem user account, `org_repo_overrides` for the kleinbem-dev organization); the per-repo resources live in `modules/repos`, instantiated once per owner in `github.tf`.
+
+Moving a repo to the org: transfer it (`gh api -X POST repos/kleinbem/<repo>/transfer -f new_owner=kleinbem-dev`), move its entry from `repo_overrides` to `org_repo_overrides`, and add `moved` blocks in `github.tf` from `module.user` to `module.org` for its six resources. GitHub keeps the ids, so the state follows without a re-import.
 Existing repos are **adopted via `import` blocks** — the first apply normalises
 settings, it never creates or destroys. **State lives in Cloudflare R2**
 (bucket `kleinbem-tofu-state`, provisioned by the nix/terraform Cloudflare

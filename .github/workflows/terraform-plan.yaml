@@ -39,6 +39,7 @@ jobs:
         with:
           app-id: ${{ secrets.APP_ID }}
           app-installation-id: ${{ secrets.APP_INSTALLATION_ID }}
+          app-org-installation-id: ${{ secrets.APP_ORG_INSTALLATION_ID }}
           app-private-key: ${{ secrets.APP_PRIVATE_KEY }}
 
       - name: tofu plan

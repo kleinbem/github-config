@@ -18,6 +18,12 @@ variable "github_app_installation_id" {
   description = "Installation ID of the GitHub App on the kleinbem account."
 }
 
+variable "github_app_org_installation_id" {
+  type        = string
+  sensitive   = true
+  description = "Installation ID of the same GitHub App on the kleinbem-dev organization (provider alias `org`)."
+}
+
 variable "github_app_pem" {
   type        = string
   sensitive   = true
