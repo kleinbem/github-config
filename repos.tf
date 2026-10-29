@@ -14,7 +14,10 @@
 
 locals {
   repo_defaults = {
-    visibility                  = "public"
+    visibility = "public"
+    # Archiving: set archived = true and apply. The provider then refuses to
+    # refresh the repo, so `just forget <repo>` its state entries and drop it from
+    # this map (removed blocks can't target single for_each instances).
     archived                    = false
     has_issues                  = true
     has_wiki                    = false
@@ -146,14 +149,6 @@ locals {
         # Created by Dependabot for its npm update PRs.
         "javascript" = { color = "168700", description = "Pull requests that update javascript code" }
       }
-    }
-    # Decommissioned 2026-09-21 (Authentik replaced it). Archived, so it's
-    # read-only; GitHub can't unarchive through the API.
-    "kleinbem-auth" = {
-      description     = "Self-hosted auth (better-auth) for kleinbem.dev — Google/Facebook/etc. login for site visitors"
-      archived        = true
-      required_checks = ["build"] # job name in .github/workflows/ci.yml
-      topics          = ["better-auth", "nodejs", "sqlite", "oauth"]
     }
     "skills" = {
       description     = "Agent skills (Claude Code plugin marketplace): nixpkgs contributions, kleinbem fleet"

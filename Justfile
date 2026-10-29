@@ -82,6 +82,32 @@ apply:
     source scripts/gh-app-env.sh
     $TOFU apply
 
+# Forget a repo's resources from state without touching GitHub (archived repos).
+forget repo:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    TOFU=$(command -v tofu 2>/dev/null || echo "nix develop --command tofu")
+    COREPI_SECRETS="../kleinbem-secrets/nix/per-host/core-pi.yaml"
+    TERRAFORM_SECRETS="../kleinbem-secrets/infra/terraform.yaml"
+    if [ -z "${CLOUDFLARE_ACCOUNT_ID:-}" ] && [ -f "$COREPI_SECRETS" ] && [ -f "$TERRAFORM_SECRETS" ]; then
+        echo "🔐 Decrypting R2 credentials from kleinbem-secrets (touch YubiKey if prompted)..." >&2
+        COREPI_YAML=$(sops -d "$COREPI_SECRETS")
+        TERRAFORM_YAML=$(sops -d "$TERRAFORM_SECRETS")
+        export CLOUDFLARE_ACCOUNT_ID=$(echo "$COREPI_YAML" | yq '.cloudflare_account_id')
+        export AWS_ACCESS_KEY_ID=$(echo "$TERRAFORM_YAML" | yq '.r2_state_access_key_id')
+        export AWS_SECRET_ACCESS_KEY=$(echo "$TERRAFORM_YAML" | yq '.r2_state_secret_access_key')
+    fi
+    if [ -z "${CLOUDFLARE_ACCOUNT_ID:-}" ] || [ "${CLOUDFLARE_ACCOUNT_ID:-}" = "null" ]; then
+        echo "❌ CLOUDFLARE_ACCOUNT_ID missing. Ensure kleinbem-secrets is available or export CLOUDFLARE_ACCOUNT_ID." >&2
+        exit 1
+    fi
+    printf 'endpoints = { s3 = "https://%s.r2.cloudflarestorage.com" }\n' "$CLOUDFLARE_ACCOUNT_ID" > .r2-endpoint.hcl
+    $TOFU init -input=false -backend-config=.r2-endpoint.hcl
+    mapfile -t addrs < <($TOFU state list | grep -F '["{{repo}}"]')
+    if [ ${#addrs[@]} -eq 0 ]; then echo "Nothing in state for {{repo}}."; exit 0; fi
+    printf '  %s\n' "${addrs[@]}"
+    $TOFU state rm "${addrs[@]}"
+
 # One-time: migrate the existing local state into R2.
 migrate-state: init
     #!/usr/bin/env bash
