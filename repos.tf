@@ -193,9 +193,6 @@ locals {
       description = "Declarative Android fleet configuration, ADB tuning, and Termux management"
       topics      = ["android", "adb", "termux", "homelab"]
     }
-    ".github" = {
-      description = "Org profile README for the kleinbem fleet"
-    }
     # Shared composite actions (nix-setup), consumed by sha pin from every
     # nix repo. Renamed from the empty kleinbem-actions placeholder.
     "actions" = {
@@ -226,6 +223,12 @@ locals {
   # user account above. Same defaults; GitHub keeps redirects from the old
   # kleinbem/<repo> URLs as long as nothing reuses the name there.
   org_repo_overrides = {
+    # Renders the org profile (profile/README.md); it never rendered on the
+    # user account. Transferred 2026-10-29.
+    ".github" = {
+      description = "Profile README of the kleinbem-dev organization"
+      coderabbit  = false # CodeRabbit isn't installed on kleinbem-dev yet
+    }
     # Transferred 2026-10-29. The transfer switched secret scanning and push
     # protection off and dropped the ruleset's admin bypass; the first plan
     # on the org put both back.

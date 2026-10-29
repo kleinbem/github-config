@@ -91,3 +91,29 @@ moved {
   from = module.user.github_issue_labels.this["nix-gantry"]
   to   = module.org.github_issue_labels.this["nix-gantry"]
 }
+
+# .github (the org profile README), transferred 2026-10-29.
+moved {
+  from = module.user.github_repository.this[".github"]
+  to   = module.org.github_repository.this[".github"]
+}
+moved {
+  from = module.user.github_repository_vulnerability_alerts.this[".github"]
+  to   = module.org.github_repository_vulnerability_alerts.this[".github"]
+}
+moved {
+  from = module.user.github_repository_dependabot_security_updates.this[".github"]
+  to   = module.org.github_repository_dependabot_security_updates.this[".github"]
+}
+moved {
+  from = module.user.github_repository_ruleset.main[".github"]
+  to   = module.org.github_repository_ruleset.main[".github"]
+}
+moved {
+  from = module.user.github_actions_repository_permissions.this[".github"]
+  to   = module.org.github_actions_repository_permissions.this[".github"]
+}
+moved {
+  from = module.user.github_issue_labels.this[".github"]
+  to   = module.org.github_issue_labels.this[".github"]
+}
