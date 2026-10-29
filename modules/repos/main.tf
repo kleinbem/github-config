@@ -87,6 +87,12 @@ resource "github_repository_dependabot_security_updates" "this" {
   enabled    = true
 }
 
+locals {
+  ruleset_checks = {
+    for n, c in var.repos : n => concat(c.required_checks, c.coderabbit ? ["CodeRabbit"] : [])
+  }
+}
+
 # Default-branch guardrails: block deletion + force-push, admin (you) bypasses
 # so direct push to the default branch still works. Rulesets are free for public repos.
 resource "github_repository_ruleset" "main" {
@@ -113,8 +119,24 @@ resource "github_repository_ruleset" "main" {
     # this is touchless. See nix-presets/git.nix for the jj-side config.
     required_signatures = true
 
+    # CodeRabbit reviews every PR (central config: <owner>/coderabbit). Its
+    # findings block the merge until fixed or answered and resolved; its
+    # check holds auto-merge until the review is in. Bot PRs and bot-pushed
+    # heads report "skipped", and a rate-limited review passes, so neither
+    # ever stalls a PR.
+    dynamic "pull_request" {
+      for_each = each.value.coderabbit ? [1] : []
+      content {
+        required_approving_review_count   = 0
+        required_review_thread_resolution = true
+        dismiss_stale_reviews_on_push     = false
+        require_code_owner_review         = false
+        require_last_push_approval        = false
+      }
+    }
+
     dynamic "required_status_checks" {
-      for_each = length(each.value.required_checks) > 0 ? [1] : []
+      for_each = length(local.ruleset_checks[each.key]) > 0 ? [1] : []
       content {
         # Not strict: GitHub auto-merge never updates a PR that fell behind
         # main, and main moves several times a day (docs syncs, lock bumps), so
@@ -123,7 +145,7 @@ resource "github_repository_ruleset" "main" {
         # catches the rare pair of PRs that only break together.
         strict_required_status_checks_policy = false
         dynamic "required_check" {
-          for_each = each.value.required_checks
+          for_each = local.ruleset_checks[each.key]
           content {
             context = required_check.value
           }
