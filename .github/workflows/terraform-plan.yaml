@@ -13,8 +13,8 @@ name: Terraform Plan (drift detection)
 on:
   schedule:
     - cron: '0 7 * * 1' # Mondays 07:00 UTC (before the governance report)
+  # No paths filter: plan is a required check, so it must report on every PR.
   pull_request:
-    paths: ['**.tf']
   workflow_dispatch:
 
 permissions:

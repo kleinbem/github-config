@@ -1,3 +1,7 @@
+# kleinbem-secrets sits next to the primary checkout, two levels up from an
+# agent workspace (github-config.ws/<name>).
+secrets := if path_exists(justfile_directory() / "../kleinbem-secrets") == "true" { justfile_directory() / "../kleinbem-secrets" } else { justfile_directory() / "../../kleinbem-secrets" }
+
 default:
     @just --list
 
@@ -12,8 +16,8 @@ init:
     # replaces nix-secrets' flat secrets.yaml): cloudflare_account_id is
     # core-pi's own (it owns the Cloudflare Tunnel), r2_state_* live in
     # infra/terraform.yaml.
-    COREPI_SECRETS="../kleinbem-secrets/nix/per-host/core-pi.yaml"
-    TERRAFORM_SECRETS="../kleinbem-secrets/infra/terraform.yaml"
+    COREPI_SECRETS="{{secrets}}/nix/per-host/core-pi.yaml"
+    TERRAFORM_SECRETS="{{secrets}}/infra/terraform.yaml"
     if [ -z "${CLOUDFLARE_ACCOUNT_ID:-}" ] && [ -f "$COREPI_SECRETS" ] && [ -f "$TERRAFORM_SECRETS" ]; then
         echo "🔐 Decrypting R2 credentials from kleinbem-secrets (touch YubiKey if prompted)..." >&2
         if COREPI_YAML=$(sops -d "$COREPI_SECRETS") && TERRAFORM_YAML=$(sops -d "$TERRAFORM_SECRETS"); then
@@ -39,8 +43,8 @@ plan:
     #!/usr/bin/env bash
     set -euo pipefail
     TOFU=$(command -v tofu 2>/dev/null || echo "nix develop --command tofu")
-    COREPI_SECRETS="../kleinbem-secrets/nix/per-host/core-pi.yaml"
-    TERRAFORM_SECRETS="../kleinbem-secrets/infra/terraform.yaml"
+    COREPI_SECRETS="{{secrets}}/nix/per-host/core-pi.yaml"
+    TERRAFORM_SECRETS="{{secrets}}/infra/terraform.yaml"
     if [ -z "${CLOUDFLARE_ACCOUNT_ID:-}" ] && [ -f "$COREPI_SECRETS" ] && [ -f "$TERRAFORM_SECRETS" ]; then
         echo "🔐 Decrypting R2 credentials from kleinbem-secrets (touch YubiKey if prompted)..." >&2
         COREPI_YAML=$(sops -d "$COREPI_SECRETS")
@@ -63,8 +67,8 @@ apply:
     #!/usr/bin/env bash
     set -euo pipefail
     TOFU=$(command -v tofu 2>/dev/null || echo "nix develop --command tofu")
-    COREPI_SECRETS="../kleinbem-secrets/nix/per-host/core-pi.yaml"
-    TERRAFORM_SECRETS="../kleinbem-secrets/infra/terraform.yaml"
+    COREPI_SECRETS="{{secrets}}/nix/per-host/core-pi.yaml"
+    TERRAFORM_SECRETS="{{secrets}}/infra/terraform.yaml"
     if [ -z "${CLOUDFLARE_ACCOUNT_ID:-}" ] && [ -f "$COREPI_SECRETS" ] && [ -f "$TERRAFORM_SECRETS" ]; then
         echo "🔐 Decrypting R2 credentials from kleinbem-secrets (touch YubiKey if prompted)..." >&2
         COREPI_YAML=$(sops -d "$COREPI_SECRETS")
@@ -87,8 +91,8 @@ forget repo:
     #!/usr/bin/env bash
     set -euo pipefail
     TOFU=$(command -v tofu 2>/dev/null || echo "nix develop --command tofu")
-    COREPI_SECRETS="../kleinbem-secrets/nix/per-host/core-pi.yaml"
-    TERRAFORM_SECRETS="../kleinbem-secrets/infra/terraform.yaml"
+    COREPI_SECRETS="{{secrets}}/nix/per-host/core-pi.yaml"
+    TERRAFORM_SECRETS="{{secrets}}/infra/terraform.yaml"
     if [ -z "${CLOUDFLARE_ACCOUNT_ID:-}" ] && [ -f "$COREPI_SECRETS" ] && [ -f "$TERRAFORM_SECRETS" ]; then
         echo "🔐 Decrypting R2 credentials from kleinbem-secrets (touch YubiKey if prompted)..." >&2
         COREPI_YAML=$(sops -d "$COREPI_SECRETS")
