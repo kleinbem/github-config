@@ -216,6 +216,13 @@ locals {
         "github_actions" = { color = "000000", description = "Pull requests that update GitHub Actions code" }
       }
     }
+    # Central CodeRabbit config: its .coderabbit.yaml applies to every repo
+    # without its own.
+    "coderabbit" = {
+      description     = "Central CodeRabbit review config for every kleinbem repo"
+      required_checks = ["validate"] # job in .github/workflows/validate.yaml
+      topics          = ["coderabbit", "code-review"]
+    }
   }
 
   repos = {
