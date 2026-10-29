@@ -89,7 +89,12 @@ resource "github_repository_dependabot_security_updates" "this" {
 
 locals {
   ruleset_checks = {
-    for n, c in var.repos : n => concat(c.required_checks, c.coderabbit ? ["CodeRabbit"] : [])
+    # integration_id 0 = any source. CodeRabbit's check is bound to its app
+    # (347564), so nothing else can satisfy it with a matching status.
+    for n, c in var.repos : n => concat(
+      [for ctx in c.required_checks : { context = ctx, integration_id = 0 }],
+      c.coderabbit ? [{ context = "CodeRabbit", integration_id = 347564 }] : [],
+    )
   }
 }
 
@@ -147,7 +152,8 @@ resource "github_repository_ruleset" "main" {
         dynamic "required_check" {
           for_each = local.ruleset_checks[each.key]
           content {
-            context = required_check.value
+            context        = required_check.value.context
+            integration_id = required_check.value.integration_id
           }
         }
       }
