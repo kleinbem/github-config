@@ -128,14 +128,13 @@ locals {
     #
     # Single sops-encrypted vault for the whole fleet — nix, openwrt,
     # CI/infra, personas. See its own README.md for the design rationale.
-    # allow_auto_merge: GitHub silently won't persist this as true on private
-    # repos on this account's plan (PATCH returns 200 but the field reverts) —
-    # declaring false here matches reality so `tofu plan` stops reporting
-    # permanent phantom drift. Same on mesh-llm-gpu below.
+    # Private repos get CodeRabbit only during its trial (the free plan covers
+    # public repos), so its check isn't required here or on mesh-llm-gpu.
     "kleinbem-secrets" = {
-      description      = "Single encrypted secrets vault for the kleinbem workspace family (nix, openwrt, CI/infra, personas)"
-      visibility       = "private"
-      allow_auto_merge = false
+      description     = "Single encrypted secrets vault for the kleinbem workspace family (nix, openwrt, CI/infra, personas)"
+      visibility      = "private"
+      coderabbit      = false
+      required_checks = ["check"] # job in check-encrypted.yaml
     }
     "kleinbem-site" = {
       description     = "kleinbem.dev — personal site (Astro + Svelte + Tailwind)"
@@ -158,10 +157,10 @@ locals {
     # GPU tests of nixpkgs' mesh-llm on the Orin's self-hosted runner. Private:
     # a self-hosted runner must never take jobs from a public repo's PRs.
     "mesh-llm-gpu" = {
-      description      = "GPU tests of nixpkgs' mesh-llm on a self-hosted Jetson runner (the GPU half of the nix-packages canary)."
-      visibility       = "private"
-      allow_auto_merge = false
-      topics           = ["mesh-llm", "github-actions", "ci", "cuda"]
+      description = "GPU tests of nixpkgs' mesh-llm on a self-hosted Jetson runner (the GPU half of the nix-packages canary)."
+      visibility  = "private"
+      coderabbit  = false
+      topics      = ["mesh-llm", "github-actions", "ci", "cuda"]
     }
     "mesh-agents" = {
       description     = "Private, self-hosted AI agents that share compute across your devices."

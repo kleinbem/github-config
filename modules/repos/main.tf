@@ -99,9 +99,10 @@ locals {
 }
 
 # Default-branch guardrails: block deletion + force-push, admin (you) bypasses
-# so direct push to the default branch still works. Rulesets are free for public repos.
+# so direct push to the default branch still works. Private repos get them too
+# since the kleinbem account moved to GitHub Pro (2026-10-30).
 resource "github_repository_ruleset" "main" {
-  for_each = { for n, c in var.repos : n => c if c.ruleset && c.visibility == "public" }
+  for_each = { for n, c in var.repos : n => c if c.ruleset }
 
   name        = "default-branch-guardrails"
   repository  = each.key
