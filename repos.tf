@@ -55,7 +55,7 @@ locals {
     }
     "openwrt-builder" = {
       description     = "OpenWrt image builder"
-      required_checks = ["validate"] # job in build.yml; the build-firmware matrix names change per profile
+      required_checks = ["validate", "all-builds"] # jobs in build.yml; all-builds aggregates the build-firmware matrix, whose names change per profile
     }
     "openwrt-config" = {
       description     = "Managing OpenWRT network"
