@@ -103,7 +103,12 @@ locals {
       topics          = ["nixos", "nix-flakes", "devenv", "dev-shells"]
     }
     "nix-holds" = {
-      description     = "Packages the kleinbem fleet holds back from nixos-unstable, with release and alert workflows"
+      description     = "Hold packages back from nixos-unstable while they're broken there, and release them once fixed"
+      required_checks = ["check"]
+      topics          = ["nixos", "nix-flakes", "nixpkgs"]
+    }
+    "nix-holds-fleet" = {
+      description     = "Packages the kleinbem fleet holds back from nixos-unstable (with nix-holds)"
       required_checks = ["check"]
       topics          = ["nixos", "nix-flakes", "nixpkgs"]
     }
