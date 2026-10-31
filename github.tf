@@ -117,3 +117,29 @@ moved {
   from = module.user.github_issue_labels.this[".github"]
   to   = module.org.github_issue_labels.this[".github"]
 }
+
+# nix-holds, transferred 2026-10-31.
+moved {
+  from = module.user.github_repository.this["nix-holds"]
+  to   = module.org.github_repository.this["nix-holds"]
+}
+moved {
+  from = module.user.github_repository_vulnerability_alerts.this["nix-holds"]
+  to   = module.org.github_repository_vulnerability_alerts.this["nix-holds"]
+}
+moved {
+  from = module.user.github_repository_dependabot_security_updates.this["nix-holds"]
+  to   = module.org.github_repository_dependabot_security_updates.this["nix-holds"]
+}
+moved {
+  from = module.user.github_repository_ruleset.main["nix-holds"]
+  to   = module.org.github_repository_ruleset.main["nix-holds"]
+}
+moved {
+  from = module.user.github_actions_repository_permissions.this["nix-holds"]
+  to   = module.org.github_actions_repository_permissions.this["nix-holds"]
+}
+moved {
+  from = module.user.github_issue_labels.this["nix-holds"]
+  to   = module.org.github_issue_labels.this["nix-holds"]
+}
