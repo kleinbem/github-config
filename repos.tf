@@ -102,11 +102,6 @@ locals {
       required_checks = ["check"]
       topics          = ["nixos", "nix-flakes", "devenv", "dev-shells"]
     }
-    "nix-holds" = {
-      description     = "Hold packages back from nixos-unstable while they're broken there, and release them once fixed"
-      required_checks = ["check"]
-      topics          = ["nixos", "nix-flakes", "nixpkgs"]
-    }
     "nix-holds-fleet" = {
       description     = "Packages the kleinbem fleet holds back from nixos-unstable (with nix-holds)"
       required_checks = ["check"]
@@ -243,6 +238,13 @@ locals {
     # Transferred 2026-10-29. The transfer switched secret scanning and push
     # protection off and dropped the ruleset's admin bypass; the first plan
     # on the org put both back.
+    # Transferred 2026-10-31, after the fleet's holds moved to
+    # kleinbem/nix-holds-fleet.
+    "nix-holds" = {
+      description     = "Hold packages back from nixos-unstable while they're broken there, and release them once fixed"
+      required_checks = ["check"]
+      topics          = ["nixos", "nix-flakes", "nixpkgs"]
+    }
     "nix-gantry" = {
       description     = "CI builds once; hosts fetch a manifest and atomically swap in a NixOS/systemd-nspawn container. No evaluation or building on the host."
       required_checks = ["check"]
