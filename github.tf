@@ -144,7 +144,7 @@ moved {
   to   = module.org.github_issue_labels.this["nix-holds"]
 }
 
-# nix-holds renamed to nix-detour, 2026-11-01. GitHub redirects the old URLs.
+# Renames: the moved blocks keep the repo (renamed in place, not recreated).
 moved {
   from = module.org.github_repository.this["nix-holds"]
   to   = module.org.github_repository.this["nix-detour"]
@@ -168,4 +168,28 @@ moved {
 moved {
   from = module.org.github_issue_labels.this["nix-holds"]
   to   = module.org.github_issue_labels.this["nix-detour"]
+}
+moved {
+  from = module.user.github_repository.this["nix-holds-fleet"]
+  to   = module.user.github_repository.this["nix-detour-fleet"]
+}
+moved {
+  from = module.user.github_repository_vulnerability_alerts.this["nix-holds-fleet"]
+  to   = module.user.github_repository_vulnerability_alerts.this["nix-detour-fleet"]
+}
+moved {
+  from = module.user.github_repository_dependabot_security_updates.this["nix-holds-fleet"]
+  to   = module.user.github_repository_dependabot_security_updates.this["nix-detour-fleet"]
+}
+moved {
+  from = module.user.github_repository_ruleset.main["nix-holds-fleet"]
+  to   = module.user.github_repository_ruleset.main["nix-detour-fleet"]
+}
+moved {
+  from = module.user.github_actions_repository_permissions.this["nix-holds-fleet"]
+  to   = module.user.github_actions_repository_permissions.this["nix-detour-fleet"]
+}
+moved {
+  from = module.user.github_issue_labels.this["nix-holds-fleet"]
+  to   = module.user.github_issue_labels.this["nix-detour-fleet"]
 }
