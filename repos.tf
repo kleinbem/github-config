@@ -241,7 +241,7 @@ locals {
     # Transferred 2026-10-31, after the fleet's holds moved to
     # kleinbem/nix-holds-fleet.
     "nix-holds" = {
-      description     = "Hold packages back from nixos-unstable while they're broken there, and release them once fixed"
+      description     = "Hold broken packages back from nixos-unstable and run packages from open nixpkgs PRs, until nixpkgs catches up"
       required_checks = ["check"]
       topics          = ["nixos", "nix-flakes", "nixpkgs"]
     }
