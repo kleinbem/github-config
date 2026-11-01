@@ -62,6 +62,7 @@ resource "github_repository" "this" {
     prevent_destroy = true
     # template is create-time provenance that GitHub can't clear afterwards;
     # ignore it so the plan doesn't propose that removal every run.
+    # no-link: GitHub can't clear it by design, not a provider bug.
     ignore_changes = [template]
   }
 }

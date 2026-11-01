@@ -1,6 +1,6 @@
 name: Terraform Apply (GitOps deploy)
 
-# Merge to main → plan → apply the exact saved plan (no re-plan in between).
+# Push to main (or a manual run) → plan → apply the exact saved plan, no re-plan.
 # If the R2 state moved meanwhile, OpenTofu rejects the stale plan file.
 # `just apply` is the local break-glass path.
 
@@ -50,7 +50,7 @@ jobs:
             -out=tfplan -detailed-exitcode 2>&1 | tee plan.txt || ec=$?
           # -detailed-exitcode only detects errors (1) here: with import blocks
           # in the plan it returns 0 even when there are real changes, so the
-          # summary line decides instead.
+          # summary line decides instead. no-link: not reported upstream yet.
           if [ "${ec:-0}" = "1" ]; then
             note="❌ Plan errored."
           elif grep -qE '^(No changes\.|Plan: 0 to import, 0 to add, 0 to change, 0 to destroy\.)' plan.txt; then

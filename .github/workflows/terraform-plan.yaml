@@ -3,6 +3,7 @@ name: Terraform Plan (drift detection)
 # Read-only drift check against the shared R2 state; never applies.
 # -detailed-exitcode only detects errors (1): with import blocks in the plan it
 # returns 0 even with real changes, so the summary line decides drift.
+# no-link: not reported upstream yet.
 
 on:
   schedule:

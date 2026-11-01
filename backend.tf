@@ -1,6 +1,7 @@
 # Shared state in Cloudflare R2; the bucket comes from nix/infra (main.tf).
 # Not committed: the endpoint (-backend-config built from $CLOUDFLARE_ACCOUNT_ID
-# by the Justfile) and the R2 key (AWS_ACCESS_KEY_ID / AWS_SECRET_ACCESS_KEY).
+# by the Justfile) and the R2 credentials (AWS_ACCESS_KEY_ID /
+# AWS_SECRET_ACCESS_KEY).
 terraform {
   backend "s3" {
     bucket = "kleinbem-tofu-state"

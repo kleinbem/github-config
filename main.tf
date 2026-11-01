@@ -11,7 +11,8 @@ terraform {
 # Credentials come from scripts/gh-app-env.sh locally and the APP_* secrets in CI.
 # Needs Administration R/W, Issues R/W, Metadata R. Apps can't create repos on a
 # user account, so repos are created by hand and adopted by github.tf's import
-# blocks; org repos stay adopt-only too so both owners work the same way.
+# blocks. Org repos follow the same convention (nothing enforces it) so both
+# owners work the same way.
 provider "github" {
   owner = "kleinbem"
   app_auth {
