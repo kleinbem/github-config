@@ -102,8 +102,8 @@ locals {
       required_checks = ["check"]
       topics          = ["nixos", "nix-flakes", "devenv", "dev-shells"]
     }
-    "nix-holds-fleet" = {
-      description     = "Packages the kleinbem fleet holds back from nixos-unstable (with nix-holds)"
+    "nix-detour-fleet" = {
+      description     = "Packages the kleinbem fleet holds back from nixos-unstable (with nix-detour)"
       required_checks = ["check"]
       topics          = ["nixos", "nix-flakes", "nixpkgs"]
     }
@@ -238,8 +238,6 @@ locals {
     # Transferred 2026-10-29. The transfer switched secret scanning and push
     # protection off and dropped the ruleset's admin bypass; the first plan
     # on the org put both back.
-    # Transferred 2026-10-31, after the fleet's holds moved to
-    # kleinbem/nix-holds-fleet. Renamed from nix-holds 2026-11-01.
     "nix-detour" = {
       description     = "Hold broken packages back from nixos-unstable and run packages from open nixpkgs PRs, until nixpkgs catches up"
       required_checks = ["check"]
