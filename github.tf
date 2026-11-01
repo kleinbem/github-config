@@ -1,6 +1,4 @@
 # ---------------------------------------------------------------------------
-# Declarative config for the general kleinbem repos. Replaces the old
-# audit_repos.py / sync_labels.py enforcement scripts with drift-free HCL.
 # Repo maps + labels live in repos.tf; the per-repo resources in
 # modules/repos, instantiated once per owner below.
 # ---------------------------------------------------------------------------
@@ -35,8 +33,7 @@ module "org" {
   }
 }
 
-# 2026-10-29: the resources moved from the root into module.user unchanged;
-# these keep the state entries, so the move plans as a no-op.
+# Keep the state of resources that used to live in the root module.
 moved {
   from = github_repository.this
   to   = module.user.github_repository.this
@@ -62,11 +59,9 @@ moved {
   to   = module.user.github_issue_labels.this
 }
 
-# A repo transferred from the user account to the org keeps its GitHub ids
-# (ruleset included), so its state entries move across too instead of being
-# forgotten and re-imported. One block per resource and repo; the transfer
-# itself is a manual step (`gh api -X POST repos/kleinbem/<repo>/transfer
-# -f new_owner=kleinbem-dev`), done before this moves.
+# A repo transferred to the org keeps its GitHub ids, so its state moves too.
+# The transfer itself is manual, done first:
+# `gh api -X POST repos/kleinbem/<repo>/transfer -f new_owner=kleinbem-dev`
 moved {
   from = module.user.github_repository.this["nix-gantry"]
   to   = module.org.github_repository.this["nix-gantry"]
@@ -92,7 +87,7 @@ moved {
   to   = module.org.github_issue_labels.this["nix-gantry"]
 }
 
-# .github (the org profile README), transferred 2026-10-29.
+# .github (the org profile README).
 moved {
   from = module.user.github_repository.this[".github"]
   to   = module.org.github_repository.this[".github"]
@@ -118,7 +113,7 @@ moved {
   to   = module.org.github_issue_labels.this[".github"]
 }
 
-# nix-holds, transferred 2026-10-31.
+# nix-holds.
 moved {
   from = module.user.github_repository.this["nix-holds"]
   to   = module.org.github_repository.this["nix-holds"]

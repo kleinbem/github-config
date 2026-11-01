@@ -1,10 +1,7 @@
 # ---------------------------------------------------------------------------
 # One owner's repos: settings, security, rulesets, Actions policy, labels.
-# Instantiated once per GitHub owner from the root (github.tf): the kleinbem
-# user account and the kleinbem-dev organization. A provider config is fixed
-# per resource block, so one owner per module instance is the only way to keep
-# the repo list a single map per owner. Imports stay in the root (import
-# blocks can't live in modules).
+# One instance per owner (github.tf), since a provider is fixed per resource
+# block. Imports stay in the root: import blocks can't live in modules.
 # ---------------------------------------------------------------------------
 
 terraform {
@@ -63,11 +60,8 @@ resource "github_repository" "this" {
 
   lifecycle {
     prevent_destroy = true
-    # template: create-time-only provenance (which template repo a repo was
-    # generated from, e.g. nix-packages <- nix-community/nur-packages-template).
-    # GitHub has no API to clear it post-creation, so it's not something
-    # repos.tf ever declares — ignore it so tofu plan stops proposing the
-    # same never-applicable removal on every run.
+    # template is create-time provenance that GitHub can't clear afterwards;
+    # ignore it so the plan doesn't propose that removal every run.
     ignore_changes = [template]
   }
 }
@@ -98,9 +92,8 @@ locals {
   }
 }
 
-# Default-branch guardrails: block deletion + force-push, admin (you) bypasses
-# so direct push to the default branch still works. Private repos get them too
-# since the kleinbem account moved to GitHub Pro (2026-10-30).
+# Default-branch guardrails: block deletion + force-push. The admin bypasses,
+# so a direct push to the default branch still works.
 resource "github_repository_ruleset" "main" {
   for_each = { for n, c in var.repos : n => c if c.ruleset }
 
@@ -120,16 +113,13 @@ resource "github_repository_ruleset" "main" {
     deletion                = true
     non_fast_forward        = true
     required_linear_history = true
-    # Require GPG/SSH signature on every commit landing on the default branch.
-    # Paired with jj's `signing.behavior = "own"` + the V2 SSH-FIDO NoTouch key,
-    # this is touchless. See nix-presets/git.nix for the jj-side config.
+    # Touchless with jj's `signing.behavior = "own"` and the no-touch SSH-FIDO
+    # key (jj config in nix-presets/vcs.nix).
     required_signatures = true
 
-    # CodeRabbit reviews every PR (central config: <owner>/coderabbit). Its
-    # findings block the merge until fixed or answered and resolved; its
-    # check holds auto-merge until the review is in. Bot PRs and bot-pushed
-    # heads report "skipped", and a rate-limited review passes, so neither
-    # ever stalls a PR.
+    # CodeRabbit (config in <owner>/coderabbit): unresolved threads block the
+    # merge. Bot PRs report "skipped" and a rate-limited review passes, so
+    # neither stalls a PR.
     dynamic "pull_request" {
       for_each = each.value.coderabbit ? [1] : []
       content {
@@ -144,11 +134,9 @@ resource "github_repository_ruleset" "main" {
     dynamic "required_status_checks" {
       for_each = length(local.ruleset_checks[each.key]) > 0 ? [1] : []
       content {
-        # Not strict: GitHub auto-merge never updates a PR that fell behind
-        # main, and main moves several times a day (docs syncs, lock bumps), so
-        # strict mode left armed PRs stuck BEHIND. A green PR merges as is;
-        # main's own CI (and nix-config's promote gate before any device)
-        # catches the rare pair of PRs that only break together.
+        # Not strict: auto-merge never updates a PR that fell behind main, and
+        # main moves often. main's own CI (and nix-config's promote gate)
+        # catches two PRs that only break together.
         strict_required_status_checks_policy = false
         dynamic "required_check" {
           for_each = local.ruleset_checks[each.key]

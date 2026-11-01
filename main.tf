@@ -7,22 +7,11 @@ terraform {
   }
 }
 
-# Auth: a short-lived GitHub App installation token, minted by the provider
-# itself from the App private key (JWT → installation-token exchange). Same
-# identity locally and in CI — no long-lived PAT anywhere:
-#
-#   local : `just plan` / `just apply` decrypt github_app_{id,installation_id,
-#           private_key} from kleinbem-secrets/nix/shared.yaml (via
-#           scripts/gh-app-env.sh) and export them as TF_VAR_github_app_*.
-#   CI    : terraform-{plan,apply}.yaml set the same TF_VAR_github_app_* from
-#           the APP_ID / APP_INSTALLATION_ID / APP_PRIVATE_KEY Actions secrets
-#           (distributed by nix/infra/github-secrets.tf).
-#
-# The App only needs Administration R/W + Issues R/W + Metadata R on the managed
-# repos — repo *creation* is out of scope (Apps can't create repos on a user
-# account; new repos are created out-of-band and adopted by the import blocks in
-# github.tf). Org repos could be created by the App, but stay adopt-only too so
-# both owners work the same way.
+# GitHub App auth, no PAT: the provider mints a short-lived installation token.
+# Credentials come from scripts/gh-app-env.sh locally and the APP_* secrets in CI.
+# Needs Administration R/W, Issues R/W, Metadata R. Apps can't create repos on a
+# user account, so repos are created by hand and adopted by github.tf's import
+# blocks; org repos stay adopt-only too so both owners work the same way.
 provider "github" {
   owner = "kleinbem"
   app_auth {
