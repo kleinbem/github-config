@@ -1,18 +1,8 @@
 #!/usr/bin/env bash
-# Sourced by `just plan` / `just apply` (never run directly).
-#
-# Exports the GitHub App credentials the tofu `github` provider reads for
-# `app_auth {}` (see main.tf):
-#   TF_VAR_github_app_id, TF_VAR_github_app_installation_id,
-#   TF_VAR_github_app_org_installation_id, TF_VAR_github_app_pem
-#
-# Source of truth is kleinbem-secrets/nix/shared.yaml — the same file
-# nix/tools/tf-apply.sh reads to distribute APP_ID / APP_INSTALLATION_ID /
-# APP_PRIVATE_KEY to CI. Martin's YubiKeys are recipients on that file.
-#
-# Skips the sops call if TF_VAR_github_app_id is already set (lets a caller
-# override for testing). The caller runs with `set -euo pipefail`, so a failure
-# here aborts the recipe.
+# Sourced by `just plan` / `just apply`: exports TF_VAR_github_app_* for the
+# provider's `app_auth {}` from kleinbem-secrets/nix/shared.yaml, the same file
+# nix/tools/tf-apply.sh pushes to CI as APP_* secrets. An already-set
+# TF_VAR_github_app_id skips sops (override for testing).
 
 if [ -z "${TF_VAR_github_app_id:-}" ]; then
     _shared_secrets="../kleinbem-secrets/nix/shared.yaml"

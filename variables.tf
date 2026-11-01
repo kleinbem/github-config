@@ -1,10 +1,5 @@
-# GitHub App credentials the provider authenticates with (`app_auth {}` in
-# main.tf). Set as TF_VAR_github_app_* by `just plan` / `just apply` (from
-# kleinbem-secrets/nix/shared.yaml, via scripts/gh-app-env.sh) and by the
-# terraform-{plan,apply}.yaml workflows (from Actions secrets). No PAT.
-#
-# The R2 state backend creds come from AWS_*/CLOUDFLARE_ACCOUNT_ID env, set the
-# same two ways — see the Justfile and the workflows.
+# GitHub App credentials for `app_auth {}` in main.tf, set as TF_VAR_github_app_*
+# (see main.tf). The R2 backend creds come from env instead (backend.tf).
 
 variable "github_app_id" {
   type        = string

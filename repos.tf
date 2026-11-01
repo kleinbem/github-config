@@ -1,15 +1,9 @@
 # ---------------------------------------------------------------------------
-# Single source of truth for ALL owned kleinbem repos' GitHub config (settings,
-# rulesets, labels, security). Public since 2026-10-28: it holds no secrets
-# (state in R2, credentials in Actions secrets), only repo names and settings.
-#
-# Split of responsibility: this repo owns repo *config*; the nix meta-workspace's
-# terraform/ owns only the Actions *secret* distribution for its CI repos (those
-# values come from sops and must run where sops is). Forks and the throwaway
-# `test` repo are excluded. Empty repos get no ruleset (no default branch yet).
-#
-# Settings normalise to best practice; `description`/`visibility` mirror current
-# GitHub state so the first apply only normalises and never clears/flips.
+# GitHub config (settings, rulesets, labels, security) for every owned repo.
+# Public: no secrets here (state in R2, credentials in Actions secrets).
+# Actions secrets are distributed by nix/infra (github-secrets.tf), which runs
+# where sops is. Forks and the throwaway `test` repo are excluded; empty repos
+# get no ruleset (no default branch yet).
 # ---------------------------------------------------------------------------
 
 locals {
@@ -47,8 +41,7 @@ locals {
     }
     "kleinbem" = { description = "It's me!" }
     # openwrt meta-workspace repos (mirrors the nix meta-workspace layout).
-    # Public as a portfolio piece: secret-relevant values (SSID, passphrase,
-    # lease MACs) live in kleinbem-secrets; the public repos hold only structure.
+    # Public: secret values (SSID, passphrase, lease MACs) live in kleinbem-secrets.
     "openwrt" = {
       description = "OpenWrt meta-workspace — tooling orchestrator for router firmware, config, and secrets"
       topics      = ["openwrt", "ansible", "infrastructure-as-code", "homelab", "monorepo", "jujutsu"]
@@ -61,12 +54,7 @@ locals {
       description     = "Managing OpenWRT network"
       required_checks = ["lint"] # job name in .github/workflows/ci.yaml
     }
-    # openwrt-secrets deleted 2026-08-08 — fully replaced by kleinbem-secrets
-    # (content migrated, every consumer repointed). Local backup kept at
-    # ../openwrt-secrets.deleted.
-
-    # nix meta-workspace repos (config here; their Actions secrets live in nix/terraform).
-    # Public ones get portfolio topics so they surface in GitHub search/discovery.
+    # nix meta-workspace repos (their Actions secrets live in nix/infra).
     "nix" = {
       description     = "nix workspace"
       required_checks = ["check"] # job name in .github/workflows/ci.yaml (infra/ + tools/ checks)
@@ -85,11 +73,9 @@ locals {
       description     = "Nix User Repository (NUR)"
       required_checks = ["check"]
       topics          = ["nixos", "nix-flakes", "nur"]
-      # update-antigravity.yaml / update-langfuse.yaml tag their auto-PRs with
-      # these via peter-evans/create-pull-request, which requires the label
-      # to already exist. github_issue_labels is exhaustive per repo, so
-      # leaving them undeclared deletes them and breaks both workflows next
-      # run. Colors match what's live today.
+      # update-antigravity.yaml / update-langfuse.yaml label their PRs with
+      # these and need them to exist; github_issue_labels deletes any label
+      # not declared.
       extra_labels = {
         "automated"   = { color = "ededed", description = "Opened automatically by a bot workflow" }
         "antigravity" = { color = "ededed", description = "Antigravity IDE/CLI update PRs" }
@@ -122,14 +108,8 @@ locals {
       required_checks = ["check"]
       topics          = ["nixos", "nix-flakes", "templates", "scaffolding"]
     }
-    # nix-secrets deleted 2026-08-08 — fully replaced by kleinbem-secrets
-    # (cutover done, zero live consumers left). Local backup kept at
-    # ../nix-secrets.deleted.
-    #
-    # Single sops-encrypted vault for the whole fleet — nix, openwrt,
-    # CI/infra, personas. See its own README.md for the design rationale.
-    # Private repos get CodeRabbit only during its trial (the free plan covers
-    # public repos), so its check isn't required here or on mesh-llm-gpu.
+    # CodeRabbit's free plan covers public repos only, so its check isn't
+    # required here or on mesh-llm-gpu.
     "kleinbem-secrets" = {
       description     = "Single encrypted secrets vault for the kleinbem workspace family (nix, openwrt, CI/infra, personas)"
       visibility      = "private"
@@ -176,10 +156,6 @@ locals {
       description = "Arch Linux PKGBUILDs for the AUR, built and checked in clean containers."
       topics      = ["archlinux", "aur", "pkgbuild"]
     }
-    # Adopted 2026-10-24: these four were created out-of-band and never
-    # declared here, so they sat on GitHub's defaults — no auto-merge, no
-    # delete-branch-on-merge, merge commits and rebase merges allowed, no
-    # ruleset. None has CI yet, so no required_checks.
     "jj-toolbox" = {
       description = "Portable jj (Jujutsu) helpers"
       topics      = ["jujutsu", "jj", "git", "cli"]
@@ -192,8 +168,7 @@ locals {
       description = "Declarative Android fleet configuration, ADB tuning, and Termux management"
       topics      = ["android", "adb", "termux", "homelab"]
     }
-    # Shared composite actions (nix-setup), consumed by sha pin from every
-    # nix repo. Renamed from the empty kleinbem-actions placeholder.
+    # Shared composite actions (nix-setup), pinned by sha from every nix repo.
     "actions" = {
       description     = "Shared GitHub Actions for the kleinbem repos (nix-setup: Determinate Nix + mesh-only Attic cache)"
       required_checks = ["actionlint", "smoke", "smoke-full", "smoke-arm"] # jobs in .github/workflows/ci.yaml
@@ -216,11 +191,9 @@ locals {
     for name, ov in local.repo_overrides : name => merge(local.repo_defaults, ov)
   }
 
-  # Repos under the kleinbem-dev organization (display name kleinbem.dev):
-  # projects built for others, moved there once they have a license, a README
-  # for strangers and CI. The fleet and everything personal stays under the
-  # user account above. Same defaults; GitHub keeps redirects from the old
-  # kleinbem/<repo> URLs as long as nothing reuses the name there.
+  # kleinbem-dev organization: projects built for others, moved there once they
+  # have a license, a README for strangers and CI. GitHub keeps redirects from
+  # kleinbem/<repo> as long as nothing reuses the name there.
   org_repo_overrides = {
     # Central CodeRabbit config for the org: CodeRabbit only reads it from a
     # `coderabbit` repo in the same org. A copy of kleinbem/coderabbit; keep
@@ -230,14 +203,12 @@ locals {
       required_checks = ["validate"] # job in .github/workflows/validate.yaml
       topics          = ["coderabbit", "code-review"]
     }
-    # Renders the org profile (profile/README.md); it never rendered on the
-    # user account. Transferred 2026-10-29.
+    # Renders the org profile (profile/README.md).
     ".github" = {
       description = "Profile README of the kleinbem-dev organization"
     }
-    # Transferred 2026-10-29. The transfer switched secret scanning and push
-    # protection off and dropped the ruleset's admin bypass; the first plan
-    # on the org put both back.
+    # A transfer switches secret scanning and push protection off and drops
+    # the ruleset's admin bypass; the next apply restores them.
     "nix-detour" = {
       description     = "Hold broken packages back from nixos-unstable and run packages from open nixpkgs PRs, until nixpkgs catches up"
       required_checks = ["check"]
@@ -258,7 +229,7 @@ locals {
     for name, ov in local.org_repo_overrides : name => merge(local.repo_defaults, ov)
   }
 
-  # Standard label set (migrated from labels.yaml). Same set the nix config uses.
+  # Standard label set.
   standard_labels = {
     "bug"              = { color = "d73a4a", description = "Something isn't working" }
     "documentation"    = { color = "0075ca", description = "Improvements or additions to documentation" }

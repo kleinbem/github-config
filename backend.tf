@@ -1,11 +1,7 @@
-# Remote state in Cloudflare R2 (S3-compatible). Keeping state shared means CI
-# drift detection is exact — no per-run "to import" noise. The bucket is
-# provisioned by the nix/terraform Cloudflare config (kleinbem-tofu-state).
-#
-# Account-specific endpoint + R2 credentials are supplied at init time, NOT
-# committed:
-#   - endpoint  -> -backend-config (generated from $CLOUDFLARE_ACCOUNT_ID; see Justfile)
-#   - creds     -> AWS_ACCESS_KEY_ID / AWS_SECRET_ACCESS_KEY env (R2 access key)
+# Shared state in Cloudflare R2; the bucket comes from nix/infra (main.tf).
+# Not committed: the endpoint (-backend-config built from $CLOUDFLARE_ACCOUNT_ID
+# by the Justfile) and the R2 credentials (AWS_ACCESS_KEY_ID /
+# AWS_SECRET_ACCESS_KEY).
 terraform {
   backend "s3" {
     bucket = "kleinbem-tofu-state"

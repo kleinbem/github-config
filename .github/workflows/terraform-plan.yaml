@@ -1,14 +1,9 @@
 name: Terraform Plan (drift detection)
 
-# Runs `tofu plan` against the shared R2 state to detect drift between the
-# declared GitHub config and reality (e.g. a setting changed in the UI).
-# `-detailed-exitcode`'s 0-vs-2 distinction is NOT trustworthy when the plan
-# includes an import-block action (every repo here is import-adopted) --
-# confirmed live 2026-09-24: it stayed 0 even with real pending changes. The
-# drift/no-drift call parses the plan's own summary line instead; the exit
-# code is still used, just only to detect a genuine plan error (1). Read-only:
-# this workflow never applies. Apply happens on merge to main
-# (terraform-apply.yaml); `just apply` is the local break-glass path.
+# Read-only drift check against the shared R2 state; never applies.
+# -detailed-exitcode only detects errors (1): with import blocks in the plan it
+# returns 0 even with real changes, so the summary line decides drift.
+# no-link: not reported upstream yet.
 
 on:
   schedule:
@@ -21,10 +16,8 @@ permissions:
   contents: read
 
 env:
-  # R2 remote-state backend — needed by every tofu state operation. GitHub
-  # provider auth (TF_VAR_github_app_*) is wired by the tofu-setup composite
-  # action from the APP_* secrets; the provider's `app_auth {}` then mints a
-  # short-lived installation token (Administration + Issues + Metadata).
+  # R2 state backend. GitHub provider auth (TF_VAR_github_app_*) comes from
+  # the tofu-setup action.
   CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
   AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
   AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
@@ -45,9 +38,7 @@ jobs:
       - name: tofu plan
         id: plan
         run: |
-          # Without pipefail the pipeline's status is tee's, never tofu's, so
-          # `ec` stayed unset and an errored plan counted as "changes" (seen
-          # 2026-10-29: a provider auth error, check green).
+          # Without pipefail `ec` is tee's status and a plan error passes.
           set -o pipefail
           tofu plan -input=false -no-color -lock-timeout=120s -detailed-exitcode 2>&1 | tee plan.txt || ec=$?
           if [ "${ec:-0}" = "1" ]; then
@@ -65,12 +56,8 @@ jobs:
           } >> "$GITHUB_STEP_SUMMARY"
           [ "$drift" = "error" ] && exit 1 || exit 0
 
-      # Scheduled drift check: a non-clean result on the Monday cron means a
-      # setting/ruleset/label changed in GitHub's UI since the last apply (or the
-      # plan itself broke). The step summary alone gets missed — ping the human
-      # alert topic. PR runs never alert (a "drift" there is just the PR's diff);
-      # only `schedule`. Best-effort: a missing/unreachable ntfy never fails the
-      # run. NTFY_ALERT_TOPIC is distributed by nix/infra/github-secrets.tf.
+      # Scheduled runs only: on a PR the "drift" is just the PR's diff.
+      # Best-effort, a missing or unreachable ntfy never fails the run.
       - name: Alert on drift via ntfy (best-effort)
         if: >-
           always() && github.event_name == 'schedule'

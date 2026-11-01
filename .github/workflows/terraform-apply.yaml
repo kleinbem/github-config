@@ -1,16 +1,8 @@
 name: Terraform Apply (GitOps deploy)
 
-# Merge to main (or manual dispatch) → plan → apply the EXACT saved plan.
-#
-# The `apply` job consumes the `tfplan` artifact the `plan` job produced — there
-# is no re-plan between the two, so what gets applied is precisely what the plan
-# showed and what you can read in the run summary / artifact. If the shared R2
-# state moved between plan and apply, OpenTofu rejects the stale plan file rather
-# than applying stale intent. `concurrency` keeps a second merge from racing an
-# in-flight apply. If the plan is a no-op, `apply` is skipped entirely.
-#
-# PRs get their preview from terraform-plan.yaml. `just apply` is the local
-# break-glass path.
+# Push to main (or a manual run) → plan → apply the exact saved plan, no re-plan.
+# If the R2 state moved meanwhile, OpenTofu rejects the stale plan file.
+# `just apply` is the local break-glass path.
 
 on:
   push:
@@ -28,9 +20,8 @@ permissions:
   contents: read
 
 env:
-  # R2 remote-state backend — needed by every tofu state operation, so it lives
-  # at workflow scope. GitHub provider auth (TF_VAR_github_app_*) is wired by the
-  # tofu-setup composite action from the APP_* secrets.
+  # R2 state backend. GitHub provider auth (TF_VAR_github_app_*) comes from
+  # the tofu-setup action.
   CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
   AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
   AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
@@ -53,22 +44,13 @@ jobs:
       - name: tofu plan
         id: plan
         run: |
-          # Without pipefail the pipeline's status is tee's, never tofu's, so
-          # `ec` stayed unset and an errored plan counted as "changes" (seen
-          # 2026-10-29: a provider auth error, check green).
+          # Without pipefail `ec` is tee's status and a plan error passes.
           set -o pipefail
           tofu plan -input=false -no-color -lock-timeout=120s \
             -out=tfplan -detailed-exitcode 2>&1 | tee plan.txt || ec=$?
-          # -detailed-exitcode is only trustworthy here for ERROR detection
-          # (1) -- its 0-vs-2 "no changes vs changes" distinction turned out
-          # to not reliably return 2 when the plan includes an import-block
-          # action (every repo here is adopted via `import`, never created
-          # out-of-band), even alongside real add/change actions. Confirmed
-          # live: every run since the plan/apply split landed (2026-09-11)
-          # silently skipped `apply` this way, despite plans showing real
-          # pending changes -- exit code stayed 0. Parse the plan's own
-          # printed summary line instead, which is unambiguous regardless
-          # of that exit-code quirk.
+          # -detailed-exitcode only detects errors (1) here: with import blocks
+          # in the plan it returns 0 even when there are real changes, so the
+          # summary line decides instead. no-link: not reported upstream yet.
           if [ "${ec:-0}" = "1" ]; then
             note="❌ Plan errored."
           elif grep -qE '^(No changes\.|Plan: 0 to import, 0 to add, 0 to change, 0 to destroy\.)' plan.txt; then
