@@ -239,8 +239,8 @@ locals {
     # protection off and dropped the ruleset's admin bypass; the first plan
     # on the org put both back.
     # Transferred 2026-10-31, after the fleet's holds moved to
-    # kleinbem/nix-holds-fleet.
-    "nix-holds" = {
+    # kleinbem/nix-holds-fleet. Renamed from nix-holds 2026-11-01.
+    "nix-detour" = {
       description     = "Hold broken packages back from nixos-unstable and run packages from open nixpkgs PRs, until nixpkgs catches up"
       required_checks = ["check"]
       topics          = ["nixos", "nix-flakes", "nixpkgs"]
