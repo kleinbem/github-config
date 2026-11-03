@@ -223,6 +223,11 @@ locals {
       required_checks = ["check"]
       topics          = ["nixos", "nix-flakes", "nixos-modules", "ai-agents", "llm", "local-llm", "self-hosted", "mesh-llm", "goose", "ollama"]
     }
+    "revue" = {
+      description     = "Nix-native AI PR code review engine with subscription fallback (Claude, Gemini, Ollama) and Forgejo support"
+      required_checks = ["check"] # job in .github/workflows/ci.yml
+      topics          = ["nix-flakes", "code-review", "ai", "llm", "ollama", "forgejo", "rust", "svelte"]
+    }
   }
 
   org_repos = {
