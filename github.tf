@@ -16,6 +16,32 @@ import {
   id       = each.key
 }
 
+# mesh-agents -> cadre (transferred to kleinbem-dev and renamed).
+moved {
+  from = module.user.github_repository.this["mesh-agents"]
+  to   = module.org.github_repository.this["cadre"]
+}
+moved {
+  from = module.user.github_repository_vulnerability_alerts.this["mesh-agents"]
+  to   = module.org.github_repository_vulnerability_alerts.this["cadre"]
+}
+moved {
+  from = module.user.github_repository_dependabot_security_updates.this["mesh-agents"]
+  to   = module.org.github_repository_dependabot_security_updates.this["cadre"]
+}
+moved {
+  from = module.user.github_repository_ruleset.main["mesh-agents"]
+  to   = module.org.github_repository_ruleset.main["cadre"]
+}
+moved {
+  from = module.user.github_actions_repository_permissions.this["mesh-agents"]
+  to   = module.org.github_actions_repository_permissions.this["cadre"]
+}
+moved {
+  from = module.user.github_issue_labels.this["mesh-agents"]
+  to   = module.org.github_issue_labels.this["cadre"]
+}
+
 # The kleinbem user account: the fleet and everything personal.
 module "user" {
   source          = "./modules/repos"

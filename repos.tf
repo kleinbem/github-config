@@ -142,11 +142,6 @@ locals {
       coderabbit  = false
       topics      = ["mesh-llm", "github-actions", "ci", "cuda"]
     }
-    "mesh-agents" = {
-      description     = "Private, self-hosted AI agents that share compute across your devices."
-      required_checks = ["check"]
-      topics          = ["nixos", "nix-flakes", "nixos-modules", "ai-agents", "llm", "local-llm", "self-hosted", "mesh-llm", "goose"]
-    }
     "chrome-open-in-app" = {
       description     = "Move browser tabs into standalone PWA/app windows (Chrome extension + Go native host)"
       required_checks = ["Lint, Test & Validate"] # job name in .github/workflows/ci.yaml
@@ -222,6 +217,11 @@ locals {
         # Created by Dependabot for its GitHub Actions update PRs.
         "github_actions" = { color = "000000", description = "Pull requests that update GitHub Actions code" }
       }
+    }
+    "cadre" = {
+      description     = "Private AI teammates on your own compute (powered by Goose over local inference: Ollama, MeshLLM)"
+      required_checks = ["check"]
+      topics          = ["nixos", "nix-flakes", "nixos-modules", "ai-agents", "llm", "local-llm", "self-hosted", "mesh-llm", "goose", "ollama"]
     }
   }
 
