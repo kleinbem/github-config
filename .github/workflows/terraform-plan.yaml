@@ -61,33 +61,29 @@ jobs:
           } >> "$GITHUB_STEP_SUMMARY"
           [ "$drift" = "error" ] && exit 1 || exit 0
 
-      # A PR that deletes or replaces anything needs the allow-destroy label:
-      # merging applies it right away. Prints addresses only, since the plan JSON
-      # carries attribute values.
+      # A PR that deletes or replaces anything, or removes a label, needs the
+      # allow-destroy label: merging applies it right away.
       - name: Gate deletes and replacements
         if: github.event_name == 'pull_request'
         env:
           ALLOW_DESTROY: ${{ contains(github.event.pull_request.labels.*.name, 'allow-destroy') }}
         run: |
           set -euo pipefail
-          destructive=$(tofu show -json tfplan | jq -r '
-            .resource_changes[]?
-            | select(.change.actions | index("delete"))
-            | "\(.change.actions | join("+"))  \(.address)"')
+          destructive=$(.github/scripts/destructive-changes.sh tfplan)
           if [ -z "$destructive" ]; then
-            echo "No deletes or replacements."
+            echo "No deletes, replacements or label removals."
             exit 0
           fi
           {
-            echo "### Deletes and replacements"
+            echo "### Deletes, replacements and label removals"
             echo '```'; echo "$destructive"; echo '```'
           } >> "$GITHUB_STEP_SUMMARY"
           echo "$destructive"
           if [ "$ALLOW_DESTROY" = true ]; then
-            echo "::warning::The plan deletes or replaces resources; allowed by the allow-destroy label."
+            echo "::warning::The plan deletes something; allowed by the allow-destroy label."
             exit 0
           fi
-          echo "::error::The plan deletes or replaces resources. If that is intended, add the allow-destroy label to the PR."
+          echo "::error::The plan deletes something. If that is intended, add the allow-destroy label to the PR."
           exit 1
 
       # Scheduled runs only: on a PR the "drift" is just the PR's diff.

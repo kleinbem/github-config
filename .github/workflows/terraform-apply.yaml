@@ -10,7 +10,13 @@ on:
       - main
     paths:
       - '**.tf'
+      - .terraform.lock.hcl
   workflow_dispatch:
+    inputs:
+      allow-destroy:
+        description: Apply even if the plan deletes resources or labels
+        type: boolean
+        default: false
 
 concurrency:
   group: terraform-apply
@@ -29,6 +35,9 @@ env:
 jobs:
   plan:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: read # the merged PR's labels, for the destroy gate
     outputs:
       has_changes: ${{ steps.plan.outputs.has_changes }}
     steps:
@@ -70,6 +79,38 @@ jobs:
             echo '```'
           } >> "$GITHUB_STEP_SUMMARY"
           [ "${ec:-0}" = "1" ] && exit 1 || exit 0
+
+      # The plan applied here is made after the merge, so check it again: a
+      # delete needs the allow-destroy label on the merged PR, or the
+      # allow-destroy input on a manual run.
+      - name: Gate deletes and replacements
+        if: steps.plan.outputs.has_changes == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          SHA: ${{ github.sha }}
+          EVENT: ${{ github.event_name }}
+          DISPATCH_ALLOW: ${{ inputs.allow-destroy }}
+        run: |
+          set -euo pipefail
+          destructive=$(.github/scripts/destructive-changes.sh tfplan)
+          if [ -z "$destructive" ]; then
+            echo "No deletes, replacements or label removals."
+            exit 0
+          fi
+          echo "$destructive"
+          if [ "$EVENT" = workflow_dispatch ]; then
+            allowed=$DISPATCH_ALLOW
+          else
+            allowed=$(gh api "repos/$REPO/commits/$SHA/pulls" \
+              --jq 'any(.[]; any(.labels[]; .name == "allow-destroy"))')
+          fi
+          if [ "$allowed" = true ]; then
+            echo "::warning::The plan deletes something; allowed by allow-destroy."
+            exit 0
+          fi
+          echo "::error::The plan deletes something and its PR has no allow-destroy label. Apply by hand or rerun with allow-destroy."
+          exit 1
 
       - name: Upload saved plan
         if: steps.plan.outputs.has_changes == 'true'
