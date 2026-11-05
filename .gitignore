@@ -2,7 +2,6 @@
 .terraform/
 *.tfstate
 *.tfstate.*
-.terraform.lock.hcl
 .r2-endpoint.hcl
 crash.log
 
