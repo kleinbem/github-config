@@ -208,6 +208,10 @@ locals {
       description     = "Hold broken packages back from nixos-unstable and run packages from open nixpkgs PRs, until nixpkgs catches up"
       required_checks = ["check"]
       topics          = ["nixos", "nix-flakes", "nixpkgs"]
+      extra_labels = {
+        # Created by Dependabot for its npm update PRs.
+        "javascript" = { color = "168700", description = "Pull requests that update javascript code" }
+      }
     }
     "nix-gantry" = {
       description     = "CI builds once; hosts fetch a manifest and atomically swap in a NixOS/systemd-nspawn container. No evaluation or building on the host."
@@ -227,6 +231,11 @@ locals {
       description     = "Nix-native AI PR code review engine with subscription fallback (Claude, Gemini, Ollama) and Forgejo support"
       required_checks = ["check"] # job in .github/workflows/ci.yml
       topics          = ["nix-flakes", "code-review", "ai", "llm", "ollama", "forgejo", "rust", "svelte"]
+      extra_labels = {
+        # Created by Dependabot for its cargo and npm update PRs.
+        "rust"       = { color = "000000", description = "Pull requests that update rust code" }
+        "javascript" = { color = "168700", description = "Pull requests that update javascript code" }
+      }
     }
   }
 
