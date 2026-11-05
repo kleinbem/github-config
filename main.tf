@@ -1,4 +1,5 @@
 terraform {
+  # >= 1.11 for ephemeral variables (variables.tf).
   required_version = ">= 1.11"
 
   required_providers {
