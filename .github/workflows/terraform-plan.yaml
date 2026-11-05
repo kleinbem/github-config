@@ -9,7 +9,9 @@ on:
   schedule:
     - cron: '0 7 * * 1' # Mondays 07:00 UTC (before the governance report)
   # No paths filter: plan is a required check, so it must report on every PR.
+  # labeled/unlabeled: the destroy gate below reads the allow-destroy label.
   pull_request:
+    types: [opened, synchronize, reopened, labeled, unlabeled]
   workflow_dispatch:
 
 permissions:
@@ -26,7 +28,9 @@ jobs:
   plan:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          persist-credentials: false
 
       - uses: ./.github/actions/tofu-setup
         with:
@@ -40,7 +44,8 @@ jobs:
         run: |
           # Without pipefail `ec` is tee's status and a plan error passes.
           set -o pipefail
-          tofu plan -input=false -no-color -lock-timeout=120s -detailed-exitcode 2>&1 | tee plan.txt || ec=$?
+          tofu plan -input=false -no-color -lock-timeout=120s -out=tfplan \
+            -detailed-exitcode 2>&1 | tee plan.txt || ec=$?
           if [ "${ec:-0}" = "1" ]; then
             drift=error;   head="❌ Plan errored."
           elif grep -qE '^(No changes\.|Plan: 0 to import, 0 to add, 0 to change, 0 to destroy\.)' plan.txt; then
@@ -55,6 +60,35 @@ jobs:
             echo '```'; tail -c 60000 plan.txt; echo '```'
           } >> "$GITHUB_STEP_SUMMARY"
           [ "$drift" = "error" ] && exit 1 || exit 0
+
+      # A PR that deletes or replaces anything needs the allow-destroy label:
+      # merging applies it right away. Prints addresses only, since the plan JSON
+      # carries attribute values.
+      - name: Gate deletes and replacements
+        if: github.event_name == 'pull_request'
+        env:
+          ALLOW_DESTROY: ${{ contains(github.event.pull_request.labels.*.name, 'allow-destroy') }}
+        run: |
+          set -euo pipefail
+          destructive=$(tofu show -json tfplan | jq -r '
+            .resource_changes[]?
+            | select(.change.actions | index("delete"))
+            | "\(.change.actions | join("+"))  \(.address)"')
+          if [ -z "$destructive" ]; then
+            echo "No deletes or replacements."
+            exit 0
+          fi
+          {
+            echo "### Deletes and replacements"
+            echo '```'; echo "$destructive"; echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+          echo "$destructive"
+          if [ "$ALLOW_DESTROY" = true ]; then
+            echo "::warning::The plan deletes or replaces resources; allowed by the allow-destroy label."
+            exit 0
+          fi
+          echo "::error::The plan deletes or replaces resources. If that is intended, add the allow-destroy label to the PR."
+          exit 1
 
       # Scheduled runs only: on a PR the "drift" is just the PR's diff.
       # Best-effort, a missing or unreachable ntfy never fails the run.

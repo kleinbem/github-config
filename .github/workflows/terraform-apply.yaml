@@ -32,7 +32,9 @@ jobs:
     outputs:
       has_changes: ${{ steps.plan.outputs.has_changes }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          persist-credentials: false
 
       - uses: ./.github/actions/tofu-setup
         with:
@@ -69,17 +71,12 @@ jobs:
           } >> "$GITHUB_STEP_SUMMARY"
           [ "${ec:-0}" = "1" ] && exit 1 || exit 0
 
-      # Ship the lock file with the plan so the apply job's `tofu init` resolves
-      # the exact same provider build the plan was made against (the lock is
-      # gitignored here, so each init would otherwise re-resolve `~> 6.0`).
       - name: Upload saved plan
         if: steps.plan.outputs.has_changes == 'true'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: tfplan
-          path: |
-            tfplan
-            .terraform.lock.hcl
+          path: tfplan
           retention-days: 5
           if-no-files-found: error
 
@@ -88,11 +85,11 @@ jobs:
     if: needs.plan.outputs.has_changes == 'true'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-
-      # Before tofu-setup's `tofu init`, so the pinned lock is in place.
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          persist-credentials: false
       - name: Download saved plan
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
         with:
           name: tfplan
 

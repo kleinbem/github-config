@@ -23,7 +23,7 @@ inputs:
 runs:
   using: composite
   steps:
-    - uses: opentofu/setup-opentofu@v1
+    - uses: opentofu/setup-opentofu@9d84900f3238fab8cd84ce47d658d25dd008be2f # v1.0.8
 
     - name: GitHub App auth → TF_VAR_github_app_*
       shell: bash
@@ -49,4 +49,5 @@ runs:
       run: |
         printf 'endpoints = { s3 = "https://%s.r2.cloudflarestorage.com" }\n' \
           "$CLOUDFLARE_ACCOUNT_ID" > .r2-endpoint.hcl
-        tofu init -input=false -backend-config=.r2-endpoint.hcl
+        # readonly: providers come from the committed lock, never re-resolved in CI.
+        tofu init -input=false -lockfile=readonly -backend-config=.r2-endpoint.hcl

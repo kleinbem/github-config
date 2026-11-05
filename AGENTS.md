@@ -23,3 +23,5 @@ credentials in Actions secrets), only repo names and settings.
 - Existing repos are **adopted via `import` blocks**, never created out-of-band — see the root CLAUDE.md's IaC placement rule (self-contained IaC gets its own repo; this is the canonical example).
 - Never delete an IaC-managed resource via `gh repo delete` or the raw API — remove it from Terraform config and apply, or the state orphans and CI breaks on the next run.
 - `just report` regenerates `DASHBOARD.md`; it's observability only, never hand-edited.
+- `.terraform.lock.hcl` is committed and CI inits with `-lockfile=readonly`. To bump the provider: `tofu init -backend=false -upgrade`, then `tofu providers lock -platform=linux_amd64 -platform=linux_arm64 -platform=darwin_arm64`, and commit the lock.
+- The PR `plan` check fails when the plan deletes or replaces anything. If that is intended, add the `allow-destroy` label to the PR; the check reruns on label changes.
