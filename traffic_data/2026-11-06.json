@@ -5,24 +5,6 @@
     "clones": 16993,
     "unique_clones": 1177
   },
-  "github-config": {
-    "views": 2,
-    "unique_views": 2,
-    "clones": 1015,
-    "unique_clones": 174
-  },
-  "nix-devshells": {
-    "views": 6,
-    "unique_views": 3,
-    "clones": 1046,
-    "unique_clones": 161
-  },
-  "nix-packages": {
-    "views": 36,
-    "unique_views": 9,
-    "clones": 2243,
-    "unique_clones": 391
-  },
   "nix": {
     "views": 27,
     "unique_views": 4,
@@ -34,6 +16,36 @@
     "unique_views": 9,
     "clones": 3190,
     "unique_clones": 347
+  },
+  "github-config": {
+    "views": 2,
+    "unique_views": 2,
+    "clones": 1015,
+    "unique_clones": 174
+  },
+  "nix-packages": {
+    "views": 36,
+    "unique_views": 9,
+    "clones": 2243,
+    "unique_clones": 391
+  },
+  "kleinbem-secrets": {
+    "views": 7,
+    "unique_views": 1,
+    "clones": 140,
+    "unique_clones": 3
+  },
+  "skills": {
+    "views": 28,
+    "unique_views": 4,
+    "clones": 2588,
+    "unique_clones": 374
+  },
+  "nix-devshells": {
+    "views": 6,
+    "unique_views": 3,
+    "clones": 1046,
+    "unique_clones": 161
   },
   "nix-hardware": {
     "views": 5,
@@ -95,12 +107,6 @@
     "clones": 48,
     "unique_clones": 25
   },
-  "skills": {
-    "views": 28,
-    "unique_views": 4,
-    "clones": 2588,
-    "unique_clones": 374
-  },
   "mesh-llm-ci": {
     "views": 6,
     "unique_views": 2,
@@ -142,12 +148,6 @@
     "unique_views": 0,
     "clones": 397,
     "unique_clones": 158
-  },
-  "kleinbem-secrets": {
-    "views": 7,
-    "unique_views": 1,
-    "clones": 140,
-    "unique_clones": 3
   },
   "mesh-llm-python-sdk": {
     "views": 0,

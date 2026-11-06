@@ -1,25 +1,13 @@
 {
-  "generated": "2026-11-06 10:57 UTC",
+  "generated": "2026-11-06 13:20 UTC",
   "repos": [
     {
       "repo": "github-config",
       "visibility": "public",
-      "branches": 4,
-      "open_issues": 2,
+      "branches": 3,
+      "open_issues": 3,
       "stale_branches": 0,
       "workflows_active": 4,
-      "workflows_disabled": 0,
-      "community_score": 0,
-      "ai_tools": [],
-      "has_description": true
-    },
-    {
-      "repo": "nix-devshells",
-      "visibility": "public",
-      "branches": 1,
-      "open_issues": 1,
-      "stale_branches": 0,
-      "workflows_active": 6,
       "workflows_disabled": 0,
       "community_score": 0,
       "ai_tools": [],
@@ -40,7 +28,7 @@
     {
       "repo": "nix",
       "visibility": "public",
-      "branches": 1,
+      "branches": 6,
       "open_issues": 3,
       "stale_branches": 0,
       "workflows_active": 6,
@@ -52,9 +40,33 @@
       "has_description": true
     },
     {
+      "repo": "kleinbem-secrets",
+      "visibility": "private",
+      "branches": 2,
+      "open_issues": 1,
+      "stale_branches": 0,
+      "workflows_active": 2,
+      "workflows_disabled": 0,
+      "community_score": 0,
+      "ai_tools": [],
+      "has_description": true
+    },
+    {
+      "repo": "nix-config",
+      "visibility": "public",
+      "branches": 4,
+      "open_issues": 8,
+      "stale_branches": 0,
+      "workflows_active": 15,
+      "workflows_disabled": 0,
+      "community_score": 0,
+      "ai_tools": [],
+      "has_description": true
+    },
+    {
       "repo": "nix-presets",
       "visibility": "public",
-      "branches": 3,
+      "branches": 4,
       "open_issues": 1,
       "stale_branches": 0,
       "workflows_active": 7,
@@ -64,12 +76,24 @@
       "has_description": true
     },
     {
-      "repo": "nix-config",
+      "repo": "skills",
       "visibility": "public",
-      "branches": 6,
-      "open_issues": 5,
+      "branches": 1,
+      "open_issues": 1,
       "stale_branches": 0,
-      "workflows_active": 15,
+      "workflows_active": 2,
+      "workflows_disabled": 0,
+      "community_score": 0,
+      "ai_tools": [],
+      "has_description": true
+    },
+    {
+      "repo": "nix-devshells",
+      "visibility": "public",
+      "branches": 1,
+      "open_issues": 1,
+      "stale_branches": 0,
+      "workflows_active": 6,
       "workflows_disabled": 0,
       "community_score": 0,
       "ai_tools": [],
@@ -200,18 +224,6 @@
       "has_description": true
     },
     {
-      "repo": "skills",
-      "visibility": "public",
-      "branches": 2,
-      "open_issues": 1,
-      "stale_branches": 0,
-      "workflows_active": 2,
-      "workflows_disabled": 0,
-      "community_score": 0,
-      "ai_tools": [],
-      "has_description": true
-    },
-    {
       "repo": "mesh-llm-ci",
       "visibility": "public",
       "branches": 1,
@@ -255,7 +267,7 @@
       "branches": 2,
       "open_issues": 1,
       "stale_branches": 0,
-      "workflows_active": 0,
+      "workflows_active": 3,
       "workflows_disabled": 0,
       "community_score": 0,
       "ai_tools": [],
@@ -294,18 +306,6 @@
       "open_issues": 0,
       "stale_branches": 0,
       "workflows_active": 4,
-      "workflows_disabled": 0,
-      "community_score": 0,
-      "ai_tools": [],
-      "has_description": true
-    },
-    {
-      "repo": "kleinbem-secrets",
-      "visibility": "private",
-      "branches": 2,
-      "open_issues": 1,
-      "stale_branches": 0,
-      "workflows_active": 0,
       "workflows_disabled": 0,
       "community_score": 0,
       "ai_tools": [],
@@ -414,7 +414,7 @@
     {
       "repo": "nixpkgs",
       "visibility": "public",
-      "branches": 316,
+      "branches": 317,
       "open_issues": 0,
       "stale_branches": 114,
       "workflows_active": 0,
@@ -424,33 +424,9 @@
       "has_description": true
     },
     {
-      "repo": "cadre",
-      "visibility": "public",
-      "branches": 4,
-      "open_issues": 0,
-      "stale_branches": 0,
-      "workflows_active": 2,
-      "workflows_disabled": 0,
-      "community_score": 0,
-      "ai_tools": [],
-      "has_description": true
-    },
-    {
-      "repo": "nix-gantry",
-      "visibility": "public",
-      "branches": 1,
-      "open_issues": 0,
-      "stale_branches": 0,
-      "workflows_active": 4,
-      "workflows_disabled": 0,
-      "community_score": 25,
-      "ai_tools": [],
-      "has_description": true
-    },
-    {
       "repo": "revue",
       "visibility": "public",
-      "branches": 3,
+      "branches": 2,
       "open_issues": 2,
       "stale_branches": 0,
       "workflows_active": 4,
@@ -459,6 +435,30 @@
       "ai_tools": [
         "Claude"
       ],
+      "has_description": true
+    },
+    {
+      "repo": "nix-gantry",
+      "visibility": "public",
+      "branches": 1,
+      "open_issues": 1,
+      "stale_branches": 0,
+      "workflows_active": 4,
+      "workflows_disabled": 0,
+      "community_score": 25,
+      "ai_tools": [],
+      "has_description": true
+    },
+    {
+      "repo": "cadre",
+      "visibility": "public",
+      "branches": 1,
+      "open_issues": 0,
+      "stale_branches": 0,
+      "workflows_active": 2,
+      "workflows_disabled": 0,
+      "community_score": 0,
+      "ai_tools": [],
       "has_description": true
     },
     {
