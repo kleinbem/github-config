@@ -1,0 +1,15 @@
+version: 2
+updates:
+  # Provider versions and the committed .terraform.lock.hcl. `opentofu`, not
+  # `terraform`: the root runs tofu and locks against registry.opentofu.org.
+  # Majors come as one PR each, so a breaking one can be ignored alone.
+  - package-ecosystem: opentofu
+    directories: ["/"]
+    schedule:
+      interval: weekly
+    cooldown:
+      default-days: 7
+    groups:
+      providers:
+        patterns: ["*"]
+        update-types: [minor, patch]
