@@ -28,18 +28,21 @@ concurrency:
 permissions:
   contents: read
 
-env:
-  # R2 state backend. GitHub provider auth (TF_VAR_github_app_*) comes from
-  # the tofu-setup action.
-  CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-  AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
-  AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
-
 jobs:
   plan:
     # A manual run on another branch would apply unreviewed config.
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
+    # The App and R2 secrets live in this environment, which only main can
+    # deploy to (nix/infra github-secrets.tf). GitHub enforces that outside this
+    # file, so a branch with an older workflow gets no credentials.
+    environment: apply
+    env:
+      # R2 state backend. GitHub provider auth (TF_VAR_github_app_*) comes from
+      # the tofu-setup action.
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
     permissions:
       contents: read
       pull-requests: read # the merged PR's labels, for the destroy gate
@@ -136,6 +139,11 @@ jobs:
     needs: plan
     if: needs.plan.outputs.has_changes == 'true'
     runs-on: ubuntu-latest
+    environment: apply
+    env:
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
         with:
