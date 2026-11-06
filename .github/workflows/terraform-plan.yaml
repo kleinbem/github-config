@@ -19,10 +19,12 @@ permissions:
 
 env:
   # R2 state backend. GitHub provider auth (TF_VAR_github_app_*) comes from
-  # the tofu-setup action.
+  # the tofu-setup action. This runs from any branch, so it gets read-only
+  # credentials: the kleinbem-plan App and an R2 token that can only read the
+  # state bucket (nix/infra github-secrets.tf). Apply's are in the apply environment.
   CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-  AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
-  AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+  AWS_ACCESS_KEY_ID: ${{ secrets.PLAN_R2_ACCESS_KEY_ID }}
+  AWS_SECRET_ACCESS_KEY: ${{ secrets.PLAN_R2_SECRET_ACCESS_KEY }}
 
 jobs:
   plan:
@@ -34,17 +36,19 @@ jobs:
 
       - uses: ./.github/actions/tofu-setup
         with:
-          app-id: ${{ secrets.APP_ID }}
-          app-installation-id: ${{ secrets.APP_INSTALLATION_ID }}
-          app-org-installation-id: ${{ secrets.APP_ORG_INSTALLATION_ID }}
-          app-private-key: ${{ secrets.APP_PRIVATE_KEY }}
+          app-id: ${{ secrets.PLAN_APP_ID }}
+          app-installation-id: ${{ secrets.PLAN_APP_INSTALLATION_ID }}
+          app-org-installation-id: ${{ secrets.PLAN_APP_ORG_INSTALLATION_ID }}
+          app-private-key: ${{ secrets.PLAN_APP_PRIVATE_KEY }}
 
       - name: tofu plan
         id: plan
         run: |
           # Without pipefail `ec` is tee's status and a plan error passes.
           set -o pipefail
-          tofu plan -input=false -no-color -lock-timeout=120s -out=tfplan \
+          # -lock=false: the read-only R2 token can't write the lock, and a plan
+          # never writes state.
+          tofu plan -input=false -no-color -lock=false -out=tfplan \
             -detailed-exitcode 2>&1 | tee plan.txt || ec=$?
           if [ "${ec:-0}" = "1" ]; then
             drift=error;   head="❌ Plan errored."
