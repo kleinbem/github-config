@@ -28,6 +28,7 @@ locals {
     web_commit_signoff_required = true # DCO sign-off for any web-UI commits
     ruleset                     = true
     required_checks             = []
+    fleet_lint                  = true # require the shared fleet-lint job (kleinbem/actions/lint)
     coderabbit                  = true # require the CodeRabbit review (modules/repos)
     bypass_apps                 = []   # list of GitHub App installation IDs for ruleset bypass (e.g. lockfile-autopilot)
     topics                      = []   # per-repo overrides via repo_overrides
@@ -204,6 +205,7 @@ locals {
     # Renders the org profile (profile/README.md).
     ".github" = {
       description = "Profile README of the kleinbem-dev organization"
+      fleet_lint  = false # README only, no CI
     }
     # A transfer switches secret scanning and push protection off and drops
     # the ruleset's admin bypass; the next apply restores them.

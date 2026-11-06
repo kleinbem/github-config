@@ -91,6 +91,7 @@ locals {
     # (347564), so nothing else can satisfy it with a matching status.
     for n, c in var.repos : n => concat(
       [for ctx in c.required_checks : { context = ctx, integration_id = 0 }],
+      c.fleet_lint ? [{ context = "fleet-lint", integration_id = 0 }] : [],
       c.coderabbit ? [{ context = "CodeRabbit", integration_id = 347564 }] : [],
     )
   }
