@@ -30,7 +30,11 @@ def gh(*args: str) -> str:
     """Run a gh command, return stdout ("" on failure — callers treat as empty)."""
     try:
         return subprocess.run(["gh", *args], check=True, capture_output=True, text=True).stdout.strip()
-    except subprocess.CalledProcessError:
+    except subprocess.CalledProcessError as e:
+        # 404 is the normal "absent" answer (community_score); log the rest so a
+        # token or rate-limit failure shows in the run log.
+        if "HTTP 404" not in e.stderr:
+            print(f"gh {' '.join(args[:2])} failed: {e.stderr.strip()[:200]}", file=sys.stderr)
         return ""
 
 
@@ -49,6 +53,8 @@ def repos() -> list[dict]:
     for owner in OWNERS:
         found += gh_json("repo", "list", owner, "--no-archived", "--limit", "1000",
                          "--json", "name,nameWithOwner,visibility,description,defaultBranchRef", default=[]) or []
+    if not found:
+        sys.exit("no repositories found; check GH_TOKEN permissions")
     return found
 
 
@@ -147,4 +153,7 @@ def traffic() -> None:
 
 if __name__ == "__main__":
     cmd = sys.argv[1] if len(sys.argv) > 1 else "report"
-    {"report": report, "traffic": traffic}.get(cmd, lambda: sys.exit(f"unknown command: {cmd}"))()
+    commands = {"report": report, "traffic": traffic}
+    if cmd not in commands:
+        sys.exit(f"unknown command: {cmd}")
+    commands[cmd]()
