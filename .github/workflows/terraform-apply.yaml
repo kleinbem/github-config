@@ -18,12 +18,12 @@ on:
         type: boolean
         default: false
 
+# Latest wins within a group, so a superseded push never applies. Dispatches
+# get their own group so one can't replace a pending push; the state lock and
+# the saved-plan check cover runs from both groups.
 concurrency:
-  group: terraform-apply
+  group: terraform-apply-${{ github.event_name }}
   cancel-in-progress: false
-  # Keep every pending run: by default a new one (even a rejected dispatch)
-  # replaces the pending main push.
-  queue: max
 
 permissions:
   contents: read
