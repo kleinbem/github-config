@@ -18,8 +18,11 @@ on:
         type: boolean
         default: false
 
+# Latest wins within a group, so a superseded push never applies. Dispatches
+# get their own group so one can't replace a pending push; the state lock and
+# the saved-plan check cover runs from both groups.
 concurrency:
-  group: terraform-apply
+  group: terraform-apply-${{ github.event_name }}
   cancel-in-progress: false
 
 permissions:
@@ -34,6 +37,8 @@ env:
 
 jobs:
   plan:
+    # A manual run on another branch would apply unreviewed config.
+    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -41,6 +46,10 @@ jobs:
     outputs:
       has_changes: ${{ steps.plan.outputs.has_changes }}
     steps:
+      # Expression `==` ignores case, so a `Main` branch passes the job's `if`.
+      - name: Main only
+        run: '[ "$GITHUB_REF" = refs/heads/main ] || { echo "::error::Apply runs only from main, not $GITHUB_REF."; exit 1; }'
+
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
         with:
           persist-credentials: false
