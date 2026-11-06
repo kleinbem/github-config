@@ -1,6 +1,8 @@
 # kleinbem-secrets sits next to the primary checkout, two levels up from an
 # agent workspace (github-config.ws/<name>).
 secrets := if path_exists(justfile_directory() / "../kleinbem-secrets") == "true" { justfile_directory() / "../kleinbem-secrets" } else { justfile_directory() / "../../kleinbem-secrets" }
+# Read by scripts/r2-env.sh and scripts/gh-app-env.sh.
+export KLEINBEM_SECRETS_DIR := secrets
 
 default:
     @just --list
@@ -12,30 +14,7 @@ init:
     #!/usr/bin/env bash
     set -euo pipefail
     TOFU=$(command -v tofu 2>/dev/null || echo "nix develop --command tofu")
-    # kleinbem-secrets scopes credentials per-consumer (cutover 2026-08-08,
-    # replaces nix-secrets' flat secrets.yaml): cloudflare_account_id is
-    # core-pi's own (it owns the Cloudflare Tunnel), r2_state_* live in
-    # infra/terraform.yaml.
-    COREPI_SECRETS="{{secrets}}/nix/per-host/core-pi.yaml"
-    TERRAFORM_SECRETS="{{secrets}}/infra/terraform.yaml"
-    if [ -z "${CLOUDFLARE_ACCOUNT_ID:-}" ] && [ -f "$COREPI_SECRETS" ] && [ -f "$TERRAFORM_SECRETS" ]; then
-        echo "🔐 Decrypting R2 credentials from kleinbem-secrets (touch YubiKey if prompted)..." >&2
-        if COREPI_YAML=$(sops -d "$COREPI_SECRETS") && TERRAFORM_YAML=$(sops -d "$TERRAFORM_SECRETS"); then
-            ACCOUNT_ID=$(echo "$COREPI_YAML" | yq '.cloudflare_account_id')
-            KEY_ID=$(echo "$TERRAFORM_YAML" | yq '.r2_state_access_key_id')
-            SECRET_KEY=$(echo "$TERRAFORM_YAML" | yq '.r2_state_secret_access_key')
-            if [ -n "$ACCOUNT_ID" ] && [ "$ACCOUNT_ID" != "null" ]; then
-                export CLOUDFLARE_ACCOUNT_ID="$ACCOUNT_ID"
-                export AWS_ACCESS_KEY_ID="$KEY_ID"
-                export AWS_SECRET_ACCESS_KEY="$SECRET_KEY"
-            fi
-        fi
-    fi
-    if [ -z "${CLOUDFLARE_ACCOUNT_ID:-}" ] || [ "${CLOUDFLARE_ACCOUNT_ID:-}" = "null" ]; then
-        echo "❌ CLOUDFLARE_ACCOUNT_ID missing. Ensure kleinbem-secrets is available or export CLOUDFLARE_ACCOUNT_ID." >&2
-        exit 1
-    fi
-    printf 'endpoints = { s3 = "https://%s.r2.cloudflarestorage.com" }\n' "$CLOUDFLARE_ACCOUNT_ID" > .r2-endpoint.hcl
+    source scripts/r2-env.sh
     $TOFU init -input=false -backend-config=.r2-endpoint.hcl
 
 # Review planned GitHub config changes (imports + in-place updates only).
@@ -43,21 +22,7 @@ plan:
     #!/usr/bin/env bash
     set -euo pipefail
     TOFU=$(command -v tofu 2>/dev/null || echo "nix develop --command tofu")
-    COREPI_SECRETS="{{secrets}}/nix/per-host/core-pi.yaml"
-    TERRAFORM_SECRETS="{{secrets}}/infra/terraform.yaml"
-    if [ -z "${CLOUDFLARE_ACCOUNT_ID:-}" ] && [ -f "$COREPI_SECRETS" ] && [ -f "$TERRAFORM_SECRETS" ]; then
-        echo "🔐 Decrypting R2 credentials from kleinbem-secrets (touch YubiKey if prompted)..." >&2
-        COREPI_YAML=$(sops -d "$COREPI_SECRETS")
-        TERRAFORM_YAML=$(sops -d "$TERRAFORM_SECRETS")
-        export CLOUDFLARE_ACCOUNT_ID=$(echo "$COREPI_YAML" | yq '.cloudflare_account_id')
-        export AWS_ACCESS_KEY_ID=$(echo "$TERRAFORM_YAML" | yq '.r2_state_access_key_id')
-        export AWS_SECRET_ACCESS_KEY=$(echo "$TERRAFORM_YAML" | yq '.r2_state_secret_access_key')
-    fi
-    if [ -z "${CLOUDFLARE_ACCOUNT_ID:-}" ] || [ "${CLOUDFLARE_ACCOUNT_ID:-}" = "null" ]; then
-        echo "❌ CLOUDFLARE_ACCOUNT_ID missing. Ensure kleinbem-secrets is available or export CLOUDFLARE_ACCOUNT_ID." >&2
-        exit 1
-    fi
-    printf 'endpoints = { s3 = "https://%s.r2.cloudflarestorage.com" }\n' "$CLOUDFLARE_ACCOUNT_ID" > .r2-endpoint.hcl
+    source scripts/r2-env.sh
     $TOFU init -input=false -backend-config=.r2-endpoint.hcl
     source scripts/gh-app-env.sh
     $TOFU plan
@@ -67,21 +32,7 @@ apply:
     #!/usr/bin/env bash
     set -euo pipefail
     TOFU=$(command -v tofu 2>/dev/null || echo "nix develop --command tofu")
-    COREPI_SECRETS="{{secrets}}/nix/per-host/core-pi.yaml"
-    TERRAFORM_SECRETS="{{secrets}}/infra/terraform.yaml"
-    if [ -z "${CLOUDFLARE_ACCOUNT_ID:-}" ] && [ -f "$COREPI_SECRETS" ] && [ -f "$TERRAFORM_SECRETS" ]; then
-        echo "🔐 Decrypting R2 credentials from kleinbem-secrets (touch YubiKey if prompted)..." >&2
-        COREPI_YAML=$(sops -d "$COREPI_SECRETS")
-        TERRAFORM_YAML=$(sops -d "$TERRAFORM_SECRETS")
-        export CLOUDFLARE_ACCOUNT_ID=$(echo "$COREPI_YAML" | yq '.cloudflare_account_id')
-        export AWS_ACCESS_KEY_ID=$(echo "$TERRAFORM_YAML" | yq '.r2_state_access_key_id')
-        export AWS_SECRET_ACCESS_KEY=$(echo "$TERRAFORM_YAML" | yq '.r2_state_secret_access_key')
-    fi
-    if [ -z "${CLOUDFLARE_ACCOUNT_ID:-}" ] || [ "${CLOUDFLARE_ACCOUNT_ID:-}" = "null" ]; then
-        echo "❌ CLOUDFLARE_ACCOUNT_ID missing. Ensure kleinbem-secrets is available or export CLOUDFLARE_ACCOUNT_ID." >&2
-        exit 1
-    fi
-    printf 'endpoints = { s3 = "https://%s.r2.cloudflarestorage.com" }\n' "$CLOUDFLARE_ACCOUNT_ID" > .r2-endpoint.hcl
+    source scripts/r2-env.sh
     $TOFU init -input=false -backend-config=.r2-endpoint.hcl
     source scripts/gh-app-env.sh
     $TOFU apply
@@ -91,21 +42,7 @@ forget repo:
     #!/usr/bin/env bash
     set -euo pipefail
     TOFU=$(command -v tofu 2>/dev/null || echo "nix develop --command tofu")
-    COREPI_SECRETS="{{secrets}}/nix/per-host/core-pi.yaml"
-    TERRAFORM_SECRETS="{{secrets}}/infra/terraform.yaml"
-    if [ -z "${CLOUDFLARE_ACCOUNT_ID:-}" ] && [ -f "$COREPI_SECRETS" ] && [ -f "$TERRAFORM_SECRETS" ]; then
-        echo "🔐 Decrypting R2 credentials from kleinbem-secrets (touch YubiKey if prompted)..." >&2
-        COREPI_YAML=$(sops -d "$COREPI_SECRETS")
-        TERRAFORM_YAML=$(sops -d "$TERRAFORM_SECRETS")
-        export CLOUDFLARE_ACCOUNT_ID=$(echo "$COREPI_YAML" | yq '.cloudflare_account_id')
-        export AWS_ACCESS_KEY_ID=$(echo "$TERRAFORM_YAML" | yq '.r2_state_access_key_id')
-        export AWS_SECRET_ACCESS_KEY=$(echo "$TERRAFORM_YAML" | yq '.r2_state_secret_access_key')
-    fi
-    if [ -z "${CLOUDFLARE_ACCOUNT_ID:-}" ] || [ "${CLOUDFLARE_ACCOUNT_ID:-}" = "null" ]; then
-        echo "❌ CLOUDFLARE_ACCOUNT_ID missing. Ensure kleinbem-secrets is available or export CLOUDFLARE_ACCOUNT_ID." >&2
-        exit 1
-    fi
-    printf 'endpoints = { s3 = "https://%s.r2.cloudflarestorage.com" }\n' "$CLOUDFLARE_ACCOUNT_ID" > .r2-endpoint.hcl
+    source scripts/r2-env.sh
     $TOFU init -input=false -backend-config=.r2-endpoint.hcl
     mapfile -t addrs < <($TOFU state list | grep -F '["{{repo}}"]')
     if [ ${#addrs[@]} -eq 0 ]; then echo "Nothing in state for {{repo}}."; exit 0; fi
