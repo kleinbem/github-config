@@ -77,12 +77,15 @@ resource "github_repository_vulnerability_alerts" "this" {
   enabled    = true
 }
 
-# Dependabot automated security fixes (free for all repos; needs vuln alerts).
+# Dependabot automated security fixes (free for all repos; needs vuln alerts,
+# so same filter and enabled after them).
 resource "github_repository_dependabot_security_updates" "this" {
-  for_each = var.repos
+  for_each = { for k, v in var.repos : k => v if v.vulnerability_alerts }
 
   repository = github_repository.this[each.key].name
   enabled    = true
+
+  depends_on = [github_repository_vulnerability_alerts.this]
 }
 
 locals {

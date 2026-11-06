@@ -12,6 +12,8 @@ locals {
     # Archiving: set archived = true and apply. The provider then refuses to
     # refresh the repo, so `just forget <repo>` its state entries and drop it from
     # this map (removed blocks can't target single for_each instances).
+    # upstream: opentofu/opentofu#1995 (removed blocks for instances).
+    # no-link: archived repos are read-only on GitHub by design.
     archived                    = false
     has_issues                  = true
     has_wiki                    = false
