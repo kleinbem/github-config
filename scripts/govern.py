@@ -26,14 +26,15 @@ AI_MARKERS = {".agent": "Antigravity", ".claude": "Claude", ".cursorrules": "Cur
 ROOT = Path(__file__).resolve().parent.parent
 
 
-def gh(*args: str) -> str:
+def gh(*args: str, quiet_404: bool = False) -> str:
     """Run a gh command, return stdout ("" on failure — callers treat as empty)."""
     try:
         return subprocess.run(["gh", *args], check=True, capture_output=True, text=True).stdout.strip()
     except subprocess.CalledProcessError as e:
-        # 404 is the normal "absent" answer (community_score); log the rest so a
-        # token or rate-limit failure shows in the run log.
-        if "HTTP 404" not in e.stderr:
+        # Logged so a token, permission or rate-limit failure shows in the run log.
+        # GitHub also answers 404 for missing access, so only callers that expect
+        # "absent" silence it.
+        if not (quiet_404 and "HTTP 404" in e.stderr):
             print(f"gh {' '.join(args[:2])} failed: {e.stderr.strip()[:200]}", file=sys.stderr)
         return ""
 
@@ -79,7 +80,7 @@ def workflow_counts(full: str) -> tuple[int, int]:
 
 def community_score(full: str) -> int:
     # gh() returns "" on a 404 (file absent) and the file JSON when present.
-    found = sum(1 for f in COMMUNITY_FILES if gh("api", f"repos/{full}/contents/{f}"))
+    found = sum(1 for f in COMMUNITY_FILES if gh("api", f"repos/{full}/contents/{f}", quiet_404=True))
     return round(found / len(COMMUNITY_FILES) * 100)
 
 
