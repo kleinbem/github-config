@@ -38,6 +38,9 @@ locals {
     "github-config" = {
       description     = "Declarative GitHub-as-code: repo settings, rulesets, labels (Terraform) + governance reporting"
       required_checks = ["plan"] # job in terraform-plan.yaml; fails only on a plan error
+      extra_labels = {
+        "allow-destroy" = { color = "b60205", description = "Lets the plan/apply gate pass a plan that deletes something" }
+      }
     }
     "kleinbem" = { description = "It's me!" }
     # openwrt meta-workspace repos (mirrors the nix meta-workspace layout).
