@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 # Sourced by `just plan` / `just apply`: exports TF_VAR_github_app_* for the
-# provider's `app_auth {}` from kleinbem-secrets/nix/shared.yaml, the same file
+# provider's `app_auth {}` from $KLEINBEM_SECRETS_DIR/nix/shared.yaml, the same file
 # nix/tools/tf-apply.sh pushes to CI as APP_* secrets. An already-set
 # TF_VAR_github_app_id skips sops (override for testing).
 
 if [ -z "${TF_VAR_github_app_id:-}" ]; then
-    _shared_secrets="../kleinbem-secrets/nix/shared.yaml"
+    _shared_secrets="${KLEINBEM_SECRETS_DIR:-../kleinbem-secrets}/nix/shared.yaml"
     if [ ! -f "$_shared_secrets" ]; then
         echo "❌ $_shared_secrets not found — clone kleinbem-secrets beside github-config." >&2
         return 1
