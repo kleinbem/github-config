@@ -62,6 +62,7 @@ jobs:
         env:
           GH_TOKEN: ${{ steps.pr-token.outputs.token }}
           REPO: ${{ github.repository }}
+          OWNER: ${{ github.repository_owner }}
         run: |
           set -euo pipefail
           mapfile -t files < <(git status --porcelain --untracked-files=all -- DASHBOARD.md governance-report.json traffic_data/ | cut -c4-)
@@ -72,11 +73,14 @@ jobs:
           printf 'Changed: %s\n' "${files[@]}"
 
           BRANCH_NAME="governance-report"
-          MAIN_SHA=$(gh api "repos/$REPO/git/ref/heads/main" --jq .object.sha)
-          if gh api "repos/$REPO/git/ref/heads/$BRANCH_NAME" >/dev/null 2>&1; then
-            gh api -X PATCH "repos/$REPO/git/refs/heads/$BRANCH_NAME" -f sha="$MAIN_SHA" -F force=true >/dev/null
+          # Build on the branch while it exists: an unmerged earlier report (its
+          # traffic file) stays, and a failed commit changes nothing. After the
+          # merge the branch is deleted, so the next report starts from main.
+          if HEAD_SHA=$(gh api "repos/$REPO/git/ref/heads/$BRANCH_NAME" --jq .object.sha 2>/dev/null); then
+            echo "Adding to $BRANCH_NAME at $HEAD_SHA."
           else
-            gh api "repos/$REPO/git/refs" -f ref="refs/heads/$BRANCH_NAME" -f sha="$MAIN_SHA" >/dev/null
+            HEAD_SHA=$(gh api "repos/$REPO/git/ref/heads/main" --jq .object.sha)
+            gh api "repos/$REPO/git/refs" -f ref="refs/heads/$BRANCH_NAME" -f sha="$HEAD_SHA" >/dev/null
           fi
 
           additions=$(for f in "${files[@]}"; do
@@ -85,7 +89,7 @@ jobs:
           jq -n \
             --arg repo "$REPO" \
             --arg branch "$BRANCH_NAME" \
-            --arg sha "$MAIN_SHA" \
+            --arg sha "$HEAD_SHA" \
             --arg headline "chore: governance report $(date -u +%Y-%m-%d)" \
             --argjson additions "$additions" \
             --arg query 'mutation($input: CreateCommitOnBranchInput!) { createCommitOnBranch(input: $input) { commit { oid } } }' \
@@ -96,25 +100,28 @@ jobs:
                 fileChanges: {additions: $additions}
             }}}' | gh api graphql --input -
 
-          # The reset leaves the branch equal to main for a moment, and GitHub can
-          # close the open PR then. Reopen it rather than strand the report.
-          PR_JSON=$(gh pr list -R "$REPO" --head "$BRANCH_NAME" --state all --limit 1 --json number,state --jq '.[0] // empty')
+          # Our own branch into main only: a fork PR can use the same head name.
+          PR_JSON=$(gh api "repos/$REPO/pulls?head=$OWNER:$BRANCH_NAME&base=main&state=all&sort=created&direction=desc&per_page=1" \
+            --jq '.[0] // empty | {number, state, merged: (.merged_at != null)}')
           PR_NUMBER=$(jq -r '.number // empty' <<<"$PR_JSON")
-          PR_STATE=$(jq -r '.state // empty' <<<"$PR_JSON")
-          if [ "$PR_STATE" = "CLOSED" ]; then
-            echo "PR #$PR_NUMBER was closed by the branch reset, reopening it."
+          PR_STATE=$(jq -r 'if . == null or . == "" then "" elif .merged then "merged" else .state end' <<<"${PR_JSON:-null}")
+          if [ "$PR_STATE" = closed ]; then
+            echo "PR #$PR_NUMBER was closed, reopening it."
             gh pr reopen -R "$REPO" "$PR_NUMBER"
-          elif [ "$PR_STATE" != "OPEN" ]; then
-            gh pr create -R "$REPO" \
+          elif [ "$PR_STATE" != open ]; then
+            url=$(gh pr create -R "$REPO" \
               --title "chore: governance report" \
               --body "Weekly governance report (DASHBOARD.md, governance-report.json, traffic_data/). Auto-merges once the checks pass." \
               --head "$BRANCH_NAME" \
-              --base main
+              --base main)
+            PR_NUMBER=${url##*/}
           fi
 
-          gh pr merge -R "$REPO" "$BRANCH_NAME" --auto --squash || true
+          # Errors here are checked below instead: arming auto-merge on a PR that
+          # already merged fails, and that case is fine.
+          gh pr merge -R "$REPO" "$PR_NUMBER" --auto --squash || true
 
           # Fail the run unless the report is on its way: an open PR with
           # auto-merge armed, or already merged.
-          gh pr view -R "$REPO" "$BRANCH_NAME" --json state,autoMergeRequest \
+          gh pr view -R "$REPO" "$PR_NUMBER" --json state,autoMergeRequest \
             --jq 'if .state == "MERGED" or (.state == "OPEN" and .autoMergeRequest != null) then "report PR: \(.state), auto-merge armed" else error("no open PR with auto-merge for the report (state: \(.state))") end'
