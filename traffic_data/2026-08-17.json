@@ -1,0 +1,86 @@
+{
+  "nix-config": {
+    "views": 28,
+    "unique_views": 2,
+    "clones": 1060,
+    "unique_clones": 202
+  },
+  "nix-presets": {
+    "views": 7,
+    "unique_views": 2,
+    "clones": 313,
+    "unique_clones": 129
+  },
+  "nix-packages": {
+    "views": 0,
+    "unique_views": 0,
+    "clones": 372,
+    "unique_clones": 119
+  },
+  "nix-hardware": {
+    "views": 2,
+    "unique_views": 1,
+    "clones": 168,
+    "unique_clones": 76
+  },
+  "nix-templates": {
+    "views": 0,
+    "unique_views": 0,
+    "clones": 108,
+    "unique_clones": 42
+  },
+  "kleinbem-site": {
+    "views": 2,
+    "unique_views": 1,
+    "clones": 6,
+    "unique_clones": 6
+  },
+  "nix-devshells": {
+    "views": 0,
+    "unique_views": 0,
+    "clones": 123,
+    "unique_clones": 52
+  },
+  "github-config": {
+    "views": 0,
+    "unique_views": 0,
+    "clones": 14,
+    "unique_clones": 1
+  },
+  "nix": {
+    "views": 15,
+    "unique_views": 2,
+    "clones": 38,
+    "unique_clones": 30
+  },
+  "kleinbem-secrets": {
+    "views": 0,
+    "unique_views": 0,
+    "clones": 0,
+    "unique_clones": 0
+  },
+  "kleinbem": {
+    "views": 1,
+    "unique_views": 1,
+    "clones": 39,
+    "unique_clones": 27
+  },
+  "openwrt-config": {
+    "views": 0,
+    "unique_views": 0,
+    "clones": 12,
+    "unique_clones": 8
+  },
+  "openwrt-builder": {
+    "views": 0,
+    "unique_views": 0,
+    "clones": 34,
+    "unique_clones": 18
+  },
+  "openwrt": {
+    "views": 0,
+    "unique_views": 0,
+    "clones": 18,
+    "unique_clones": 15
+  }
+}

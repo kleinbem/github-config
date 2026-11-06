@@ -1,0 +1,13 @@
+# Terraform / OpenTofu — state lives in R2 now, but keep local artifacts out.
+.terraform/
+*.tfstate
+*.tfstate.*
+.r2-endpoint.hcl
+crash.log
+
+# Python
+__pycache__/
+*.pyc
+
+# Environment & Direnv
+.direnv/

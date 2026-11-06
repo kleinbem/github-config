@@ -1,0 +1,117 @@
+name: Terraform Plan (drift detection)
+
+# Read-only drift check against the shared R2 state; never applies.
+# -detailed-exitcode only detects errors (1): with import blocks in the plan it
+# returns 0 even with real changes, so the summary line decides drift.
+# no-link: not reported upstream yet.
+
+on:
+  schedule:
+    - cron: '0 7 * * 1' # Mondays 07:00 UTC (before the governance report)
+  # No paths filter: plan is a required check, so it must report on every PR.
+  # labeled/unlabeled: the destroy gate below reads the allow-destroy label.
+  pull_request:
+    types: [opened, synchronize, reopened, labeled, unlabeled]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  # R2 state backend. GitHub provider auth (TF_VAR_github_app_*) comes from
+  # the tofu-setup action.
+  CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+  AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+  AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+
+jobs:
+  plan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          persist-credentials: false
+
+      - uses: ./.github/actions/tofu-setup
+        with:
+          app-id: ${{ secrets.APP_ID }}
+          app-installation-id: ${{ secrets.APP_INSTALLATION_ID }}
+          app-org-installation-id: ${{ secrets.APP_ORG_INSTALLATION_ID }}
+          app-private-key: ${{ secrets.APP_PRIVATE_KEY }}
+
+      - name: tofu plan
+        id: plan
+        run: |
+          # Without pipefail `ec` is tee's status and a plan error passes.
+          set -o pipefail
+          tofu plan -input=false -no-color -lock-timeout=120s -out=tfplan \
+            -detailed-exitcode 2>&1 | tee plan.txt || ec=$?
+          if [ "${ec:-0}" = "1" ]; then
+            drift=error;   head="❌ Plan errored."
+          elif grep -qE '^(No changes\.|Plan: 0 to import, 0 to add, 0 to change, 0 to destroy\.)' plan.txt; then
+            drift=none;    head="✅ No drift — GitHub matches the declared config."
+          else
+            drift=changes; head="⚠️ **Drift detected** — see the \`~\`/\`-\`/\`+\` lines below."
+          fi
+          echo "drift=$drift" >> "$GITHUB_OUTPUT"
+          {
+            echo "## tofu plan — github-config"
+            echo "$head"
+            echo '```'; tail -c 60000 plan.txt; echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+          [ "$drift" = "error" ] && exit 1 || exit 0
+
+      # A PR that deletes or replaces anything, or removes a label, needs the
+      # allow-destroy label: merging applies it right away.
+      - name: Gate deletes and replacements
+        if: github.event_name == 'pull_request'
+        env:
+          ALLOW_DESTROY: ${{ contains(github.event.pull_request.labels.*.name, 'allow-destroy') }}
+        run: |
+          set -euo pipefail
+          destructive=$(.github/scripts/destructive-changes.sh tfplan)
+          if [ -z "$destructive" ]; then
+            echo "No deletes, replacements or label removals."
+            exit 0
+          fi
+          {
+            echo "### Deletes, replacements and label removals"
+            echo '```'; echo "$destructive"; echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+          echo "$destructive"
+          if [ "$ALLOW_DESTROY" = true ]; then
+            echo "::warning::The plan deletes something; allowed by the allow-destroy label."
+            exit 0
+          fi
+          echo "::error::The plan deletes something. If that is intended, add the allow-destroy label to the PR."
+          exit 1
+
+      # Scheduled runs only: on a PR the "drift" is just the PR's diff.
+      # Best-effort, a missing or unreachable ntfy never fails the run.
+      - name: Alert on drift via ntfy (best-effort)
+        if: >-
+          always() && github.event_name == 'schedule'
+          && (steps.plan.outputs.drift == 'changes' || steps.plan.outputs.drift == 'error')
+        continue-on-error: true
+        env:
+          NTFY_TOPIC: ${{ secrets.NTFY_ALERT_TOPIC }}
+          DRIFT: ${{ steps.plan.outputs.drift }}
+        run: |
+          set -euo pipefail
+          if [ -z "${NTFY_TOPIC:-}" ]; then
+            echo "NTFY_ALERT_TOPIC not set — skipping alert."
+            exit 0
+          fi
+          if [ "$DRIFT" = "error" ]; then
+            title="github-config: drift plan ERRORED"
+            body="The scheduled tofu plan for github-config failed to run — GitHub config state is unverified."
+          else
+            title="github-config: DRIFT detected"
+            body="Scheduled tofu plan found GitHub config that no longer matches Terraform — likely a setting/ruleset/label changed in the UI. Reconcile via a PR, or apply."
+          fi
+          curl -fsS --max-time 15 \
+            -H "Title: $title" \
+            -H "Tags: warning" \
+            -H "Priority: high" \
+            -d "$body Run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}" \
+            "https://ntfy.kleinbem.dev/$NTFY_TOPIC"
