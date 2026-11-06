@@ -1,0 +1,6 @@
+# actionlint doesn't know concurrency `queue` yet (documented by GitHub).
+# upstream: rhysd/actionlint#654
+paths:
+  .github/workflows/terraform-apply.yaml:
+    ignore:
+      - 'unexpected key "queue" for "concurrency" section'

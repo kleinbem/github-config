@@ -21,6 +21,9 @@ on:
 concurrency:
   group: terraform-apply
   cancel-in-progress: false
+  # Keep every pending run: by default a new one (even a rejected dispatch)
+  # replaces the pending main push.
+  queue: max
 
 permissions:
   contents: read
