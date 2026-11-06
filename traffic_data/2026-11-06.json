@@ -1,0 +1,206 @@
+{
+  "nix-config": {
+    "views": 28,
+    "unique_views": 7,
+    "clones": 16993,
+    "unique_clones": 1177
+  },
+  "github-config": {
+    "views": 2,
+    "unique_views": 2,
+    "clones": 1015,
+    "unique_clones": 174
+  },
+  "nix-devshells": {
+    "views": 6,
+    "unique_views": 3,
+    "clones": 1046,
+    "unique_clones": 161
+  },
+  "nix-packages": {
+    "views": 36,
+    "unique_views": 9,
+    "clones": 2243,
+    "unique_clones": 391
+  },
+  "nix": {
+    "views": 27,
+    "unique_views": 4,
+    "clones": 1645,
+    "unique_clones": 226
+  },
+  "nix-presets": {
+    "views": 31,
+    "unique_views": 9,
+    "clones": 3190,
+    "unique_clones": 347
+  },
+  "nix-hardware": {
+    "views": 5,
+    "unique_views": 3,
+    "clones": 443,
+    "unique_clones": 147
+  },
+  "nix-templates": {
+    "views": 4,
+    "unique_views": 2,
+    "clones": 346,
+    "unique_clones": 122
+  },
+  "actions": {
+    "views": 7,
+    "unique_views": 3,
+    "clones": 784,
+    "unique_clones": 140
+  },
+  "openwrt-builder": {
+    "views": 8,
+    "unique_views": 6,
+    "clones": 394,
+    "unique_clones": 80
+  },
+  "nix-toolbox": {
+    "views": 1,
+    "unique_views": 1,
+    "clones": 342,
+    "unique_clones": 95
+  },
+  "aur-packages": {
+    "views": 5,
+    "unique_views": 2,
+    "clones": 105,
+    "unique_clones": 54
+  },
+  "coderabbit": {
+    "views": 1,
+    "unique_views": 1,
+    "clones": 245,
+    "unique_clones": 84
+  },
+  "openwrt-config": {
+    "views": 8,
+    "unique_views": 3,
+    "clones": 356,
+    "unique_clones": 90
+  },
+  "jj-toolbox": {
+    "views": 5,
+    "unique_views": 3,
+    "clones": 292,
+    "unique_clones": 81
+  },
+  "chrome-open-in-app": {
+    "views": 2,
+    "unique_views": 2,
+    "clones": 48,
+    "unique_clones": 25
+  },
+  "skills": {
+    "views": 28,
+    "unique_views": 4,
+    "clones": 2588,
+    "unique_clones": 374
+  },
+  "mesh-llm-ci": {
+    "views": 6,
+    "unique_views": 2,
+    "clones": 275,
+    "unique_clones": 84
+  },
+  "android-config": {
+    "views": 1,
+    "unique_views": 1,
+    "clones": 50,
+    "unique_clones": 31
+  },
+  "kleinbem-site": {
+    "views": 5,
+    "unique_views": 4,
+    "clones": 469,
+    "unique_clones": 116
+  },
+  "mesh-llm-gpu": {
+    "views": 1,
+    "unique_views": 1,
+    "clones": 81,
+    "unique_clones": 3
+  },
+  "openwrt": {
+    "views": 5,
+    "unique_views": 4,
+    "clones": 103,
+    "unique_clones": 41
+  },
+  "kleinbem": {
+    "views": 18,
+    "unique_views": 4,
+    "clones": 2189,
+    "unique_clones": 226
+  },
+  "nix-detour-fleet": {
+    "views": 0,
+    "unique_views": 0,
+    "clones": 397,
+    "unique_clones": 158
+  },
+  "kleinbem-secrets": {
+    "views": 7,
+    "unique_views": 1,
+    "clones": 140,
+    "unique_clones": 3
+  },
+  "mesh-llm-python-sdk": {
+    "views": 0,
+    "unique_views": 0,
+    "clones": 2,
+    "unique_clones": 2
+  },
+  "nixpkgs-review-gha": {
+    "views": 8,
+    "unique_views": 2,
+    "clones": 847,
+    "unique_clones": 49
+  },
+  "buzz-app": {
+    "views": 1,
+    "unique_views": 1,
+    "clones": 564,
+    "unique_clones": 54
+  },
+  "rfc39-record": {
+    "views": 2,
+    "unique_views": 2,
+    "clones": 15,
+    "unique_clones": 14
+  },
+  "llama.cpp": {
+    "views": 1,
+    "unique_views": 1,
+    "clones": 11,
+    "unique_clones": 11
+  },
+  "goose": {
+    "views": 2,
+    "unique_views": 2,
+    "clones": 8,
+    "unique_clones": 8
+  },
+  "mesh-llm": {
+    "views": 8,
+    "unique_views": 2,
+    "clones": 2751,
+    "unique_clones": 346
+  },
+  "buzz": {
+    "views": 2,
+    "unique_views": 2,
+    "clones": 4,
+    "unique_clones": 3
+  },
+  "nixpkgs": {
+    "views": 3,
+    "unique_views": 3,
+    "clones": 1350,
+    "unique_clones": 233
+  }
+}
