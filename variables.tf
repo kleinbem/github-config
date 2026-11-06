@@ -19,8 +19,11 @@ variable "github_app_org_installation_id" {
   description = "Installation ID of the same GitHub App on the kleinbem-dev organization (provider alias `org`)."
 }
 
+# Ephemeral keeps the key out of saved plan files: apply's tfplan travels as a
+# workflow artifact, which anyone can download from a public repo.
 variable "github_app_pem" {
   type        = string
   sensitive   = true
+  ephemeral   = true
   description = "GitHub App private key — PEM contents (not a path). Provider does the JWT → installation-token exchange."
 }

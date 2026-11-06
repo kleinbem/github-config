@@ -112,6 +112,8 @@ jobs:
           echo "::error::The plan deletes something and its PR has no allow-destroy label. Apply by hand or rerun with allow-destroy."
           exit 1
 
+      # The App key is an ephemeral variable (variables.tf), so the saved plan
+      # doesn't carry it; the apply job supplies it again.
       - name: Upload saved plan
         if: steps.plan.outputs.has_changes == 'true'
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
