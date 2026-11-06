@@ -43,6 +43,10 @@ jobs:
     outputs:
       has_changes: ${{ steps.plan.outputs.has_changes }}
     steps:
+      # Expression `==` ignores case, so a `Main` branch passes the job's `if`.
+      - name: Main only
+        run: '[ "$GITHUB_REF" = refs/heads/main ] || { echo "::error::Apply runs only from main, not $GITHUB_REF."; exit 1; }'
+
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
         with:
           persist-credentials: false
