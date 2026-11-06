@@ -34,6 +34,8 @@ env:
 
 jobs:
   plan:
+    # A manual run on another branch would apply unreviewed config.
+    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     permissions:
       contents: read
