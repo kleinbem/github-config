@@ -1,6 +1,7 @@
 name: Terraform Plan (drift detection)
 
-# Read-only drift check against the shared R2 state; never applies.
+# PR plan (job `plan`, the required check) and weekly drift check (job `drift`)
+# against the shared R2 state; never applies.
 # -detailed-exitcode only detects errors (1): with import blocks in the plan it
 # returns 0 even with real changes, so the summary line decides drift.
 # no-link: not reported upstream yet.
@@ -17,16 +18,18 @@ on:
 permissions:
   contents: read
 
-env:
-  # R2 state backend. GitHub provider auth (TF_VAR_github_app_*) comes from
-  # the tofu-setup action.
-  CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-  AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
-  AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
-
 jobs:
+  # PR check: the PR's config against state. It runs from any branch, so it
+  # gets read-only credentials (nix/infra github-secrets.tf): the kleinbem-plan
+  # App and an R2 token that can only read the state bucket.
   plan:
+    if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
+    env:
+      # GitHub provider auth (TF_VAR_github_app_*) comes from tofu-setup.
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      AWS_ACCESS_KEY_ID: ${{ secrets.PLAN_R2_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.PLAN_R2_SECRET_ACCESS_KEY }}
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
         with:
@@ -34,24 +37,28 @@ jobs:
 
       - uses: ./.github/actions/tofu-setup
         with:
-          app-id: ${{ secrets.APP_ID }}
-          app-installation-id: ${{ secrets.APP_INSTALLATION_ID }}
-          app-org-installation-id: ${{ secrets.APP_ORG_INSTALLATION_ID }}
-          app-private-key: ${{ secrets.APP_PRIVATE_KEY }}
+          app-id: ${{ secrets.PLAN_APP_ID }}
+          app-installation-id: ${{ secrets.PLAN_APP_INSTALLATION_ID }}
+          app-org-installation-id: ${{ secrets.PLAN_APP_ORG_INSTALLATION_ID }}
+          app-private-key: ${{ secrets.PLAN_APP_PRIVATE_KEY }}
 
       - name: tofu plan
         id: plan
         run: |
           # Without pipefail `ec` is tee's status and a plan error passes.
           set -o pipefail
-          tofu plan -input=false -no-color -lock-timeout=120s -out=tfplan \
+          # -lock=false: the read-only R2 token can't write the lock, and a plan
+          # never writes state. -refresh=false: GitHub hides merge settings and
+          # ruleset bypass actors from read-only tokens, so a refresh shows false
+          # drift on every repo. The drift job below refreshes.
+          tofu plan -input=false -no-color -lock=false -refresh=false -out=tfplan \
             -detailed-exitcode 2>&1 | tee plan.txt || ec=$?
           if [ "${ec:-0}" = "1" ]; then
             drift=error;   head="❌ Plan errored."
           elif grep -qE '^(No changes\.|Plan: 0 to import, 0 to add, 0 to change, 0 to destroy\.)' plan.txt; then
-            drift=none;    head="✅ No drift — GitHub matches the declared config."
+            drift=none;    head="✅ No changes against the state."
           else
-            drift=changes; head="⚠️ **Drift detected** — see the \`~\`/\`-\`/\`+\` lines below."
+            drift=changes; head="📝 Changes against the state — see the \`~\`/\`-\`/\`+\` lines below."
           fi
           echo "drift=$drift" >> "$GITHUB_OUTPUT"
           {
@@ -86,16 +93,60 @@ jobs:
           echo "::error::The plan deletes something. If that is intended, add the allow-destroy label to the PR."
           exit 1
 
+  # Weekly drift check: GitHub as it is against the declared config, which needs
+  # a refresh, so the write credentials from the main-only apply environment.
+  # It never applies.
+  drift:
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    environment: apply
+    env:
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          persist-credentials: false
+
+      - uses: ./.github/actions/tofu-setup
+        with:
+          app-id: ${{ secrets.APP_ID }}
+          app-installation-id: ${{ secrets.APP_INSTALLATION_ID }}
+          app-org-installation-id: ${{ secrets.APP_ORG_INSTALLATION_ID }}
+          app-private-key: ${{ secrets.APP_PRIVATE_KEY }}
+
+      - name: tofu plan (refreshed)
+        id: drift
+        run: |
+          set -o pipefail
+          tofu plan -input=false -no-color -lock-timeout=120s \
+            -detailed-exitcode 2>&1 | tee plan.txt || ec=$?
+          if [ "${ec:-0}" = "1" ]; then
+            drift=error;   head="❌ Plan errored."
+          elif grep -qE '^(No changes\.|Plan: 0 to import, 0 to add, 0 to change, 0 to destroy\.)' plan.txt; then
+            drift=none;    head="✅ No drift — GitHub matches the declared config."
+          else
+            drift=changes; head="⚠️ **Drift detected** — see the \`~\`/\`-\`/\`+\` lines below."
+          fi
+          echo "drift=$drift" >> "$GITHUB_OUTPUT"
+          {
+            echo "## tofu plan (drift) — github-config"
+            echo "$head"
+            echo '```'; tail -c 60000 plan.txt; echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+          [ "$drift" = "error" ] && exit 1 || exit 0
+
       # Scheduled runs only: on a PR the "drift" is just the PR's diff.
       # Best-effort, a missing or unreachable ntfy never fails the run.
       - name: Alert on drift via ntfy (best-effort)
         if: >-
           always() && github.event_name == 'schedule'
-          && (steps.plan.outputs.drift == 'changes' || steps.plan.outputs.drift == 'error')
+          && (steps.drift.outputs.drift == 'changes' || steps.drift.outputs.drift == 'error')
         continue-on-error: true
         env:
           NTFY_TOPIC: ${{ secrets.NTFY_ALERT_TOPIC }}
-          DRIFT: ${{ steps.plan.outputs.drift }}
+          DRIFT: ${{ steps.drift.outputs.drift }}
         run: |
           set -euo pipefail
           if [ -z "${NTFY_TOPIC:-}" ]; then
