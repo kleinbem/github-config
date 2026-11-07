@@ -262,6 +262,15 @@ locals {
         "javascript" = { color = "168700", description = "Pull requests that update javascript code" }
       }
     }
+    "attic-ui" = {
+      description     = "Next-generation web interface and store inspector for Attic Nix binary cache"
+      required_checks = ["check"] # job in .github/workflows/ci.yml
+      topics          = ["svelte", "sveltekit", "attic", "nix", "nix-binary-cache", "nixos", "nix-flakes", "tailwind"]
+      extra_labels = {
+        # Created by Dependabot for its npm update PRs.
+        "javascript" = { color = "168700", description = "Pull requests that update javascript code" }
+      }
+    }
   }
 
   org_repos = {
