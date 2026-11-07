@@ -253,6 +253,15 @@ locals {
         "javascript" = { color = "168700", description = "Pull requests that update javascript code" }
       }
     }
+    "foyer" = {
+      description     = "Next-generation lightweight homelab portal and service launchpad for the kleinbem fleet"
+      required_checks = ["check"] # job in .github/workflows/ci.yml
+      topics          = ["svelte", "sveltekit", "homelab", "dashboard", "nixos", "nix-flakes", "tailwind"]
+      extra_labels = {
+        # Created by Dependabot for its npm update PRs.
+        "javascript" = { color = "168700", description = "Pull requests that update javascript code" }
+      }
+    }
   }
 
   org_repos = {
