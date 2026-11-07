@@ -169,6 +169,15 @@ locals {
       description = "Declarative Android fleet configuration, ADB tuning, and Termux management"
       topics      = ["android", "adb", "termux", "homelab"]
     }
+    "web-config" = {
+      description     = "Shared cutting-edge SvelteKit, Vite, and Tailwind configuration for the kleinbem fleet"
+      required_checks = ["check"]
+      topics          = ["svelte", "sveltekit", "tailwindcss", "vite", "typescript"]
+      extra_labels = {
+        "javascript"     = { color = "168700", description = "Pull requests that update javascript code" }
+        "github_actions" = { color = "000000", description = "Pull requests that update GitHub Actions code" }
+      }
+    }
     # Shared composite actions (nix-setup), pinned by sha from every nix repo.
     "actions" = {
       description     = "Shared GitHub Actions for the kleinbem repos (nix-setup: Determinate Nix + mesh-only Attic cache)"
