@@ -19,6 +19,9 @@ updates:
     directories: ["/", "/.github/actions/tofu-setup"]
     schedule:
       interval: weekly
+    # Majors come as one PR each, so more than the default 5 can be due at
+    # once, and Dependabot drops the ones over the limit without a word.
+    open-pull-requests-limit: 10
     cooldown:
       default-days: 7
     groups:
