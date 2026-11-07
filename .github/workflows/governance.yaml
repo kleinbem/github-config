@@ -30,7 +30,7 @@ jobs:
         id: app-token
         uses: actions/create-github-app-token@64ab729a6294000f5aa4a4bc0b73d1f32bc45510 # v3.3.0
         with:
-          app-id: ${{ secrets.PLAN_APP_ID }}
+          client-id: ${{ secrets.PLAN_APP_ID }}
           private-key: ${{ secrets.PLAN_APP_PRIVATE_KEY }}
           # The report covers every repo of the owner, so no repositories list.
           # Administration for traffic, actions for workflows, contents and
@@ -90,7 +90,7 @@ jobs:
         id: pr-token
         uses: actions/create-github-app-token@64ab729a6294000f5aa4a4bc0b73d1f32bc45510 # v3.3.0
         with:
-          app-id: ${{ secrets.APP_ID }}
+          client-id: ${{ secrets.APP_ID }}
           private-key: ${{ secrets.APP_PRIVATE_KEY }}
           # Branch ref + commit, then open/reopen the PR and arm auto-merge.
           permission-contents: write
