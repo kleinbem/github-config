@@ -158,12 +158,14 @@ locals {
       topics      = ["archlinux", "aur", "pkgbuild"]
     }
     "jj-toolbox" = {
-      description = "Portable jj (Jujutsu) helpers"
-      topics      = ["jujutsu", "jj", "git", "cli"]
+      description     = "Portable jj (Jujutsu) helpers"
+      required_checks = ["lint"] # job name in .github/workflows/ci.yaml
+      topics          = ["jujutsu", "jj", "git", "cli"]
     }
     "nix-toolbox" = {
-      description = "Portable Nix flake dev-workflow tools"
-      topics      = ["nix", "nix-flakes", "cli"]
+      description     = "Portable Nix flake dev-workflow tools"
+      required_checks = ["lint"] # job name in .github/workflows/ci.yaml
+      topics          = ["nix", "nix-flakes", "cli"]
     }
     "android-config" = {
       description = "Declarative Android fleet configuration, ADB tuning, and Termux management"
