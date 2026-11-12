@@ -87,8 +87,6 @@ locals {
       extra_labels = {
         "automated"   = { color = "ededed", description = "Opened automatically by a bot workflow" }
         "antigravity" = { color = "ededed", description = "Antigravity IDE/CLI update PRs" }
-        # Created by Dependabot for its GitHub Actions update PRs.
-        "github_actions" = { color = "000000", description = "Pull requests that update GitHub Actions code" }
       }
     }
     "nix-devshells" = {
@@ -128,10 +126,6 @@ locals {
       description     = "kleinbem.dev — personal site (Astro + Svelte + Tailwind)"
       required_checks = ["build"] # job name in kleinbem-site/.github/workflows/ci.yaml
       topics          = ["astro", "svelte", "tailwindcss", "personal-website"]
-      extra_labels = {
-        # Created by Dependabot for its npm update PRs.
-        "javascript" = { color = "168700", description = "Pull requests that update javascript code" }
-      }
     }
     "skills" = {
       description     = "Agent skills (Claude Code plugin marketplace): nixpkgs contributions, kleinbem fleet"
@@ -177,20 +171,12 @@ locals {
       description     = "Shared cutting-edge SvelteKit, Vite, and Tailwind configuration for the kleinbem fleet"
       required_checks = ["check"]
       topics          = ["svelte", "sveltekit", "tailwindcss", "vite", "typescript"]
-      extra_labels = {
-        "javascript"     = { color = "168700", description = "Pull requests that update javascript code" }
-        "github_actions" = { color = "000000", description = "Pull requests that update GitHub Actions code" }
-      }
     }
     # Shared composite actions (nix-setup), pinned by sha from every nix repo.
     "actions" = {
       description     = "Shared GitHub Actions for the kleinbem repos (nix-setup: Determinate Nix + mesh-only Attic cache)"
       required_checks = ["actionlint", "smoke", "smoke-full", "smoke-arm"] # jobs in .github/workflows/ci.yaml
       topics          = ["github-actions", "composite-action", "nix", "ci"]
-      extra_labels = {
-        # Created by Dependabot for its GitHub Actions update PRs.
-        "github_actions" = { color = "000000", description = "Pull requests that update GitHub Actions code" }
-      }
     }
     # Central CodeRabbit config: its .coderabbit.yaml applies to every repo
     # without its own.
@@ -228,19 +214,11 @@ locals {
       description     = "Hold broken packages back from nixos-unstable and run packages from open nixpkgs PRs, until nixpkgs catches up"
       required_checks = ["check"]
       topics          = ["nixos", "nix-flakes", "nixpkgs"]
-      extra_labels = {
-        # Created by Dependabot for its npm update PRs.
-        "javascript" = { color = "168700", description = "Pull requests that update javascript code" }
-      }
     }
     "nix-gantry" = {
       description     = "CI builds once; hosts fetch a manifest and atomically swap in a NixOS/systemd-nspawn container. No evaluation or building on the host."
       required_checks = ["check"]
       topics          = ["nixos", "nix-flakes", "nixos-modules", "containers", "systemd"]
-      extra_labels = {
-        # Created by Dependabot for its GitHub Actions update PRs.
-        "github_actions" = { color = "000000", description = "Pull requests that update GitHub Actions code" }
-      }
     }
     "cadre" = {
       description     = "Private AI teammates on your own compute (powered by Goose over local inference: Ollama, MeshLLM)"
@@ -251,29 +229,16 @@ locals {
       description     = "Nix-native AI PR code review engine with subscription fallback (Claude, Gemini, Ollama) and Forgejo support"
       required_checks = ["check"] # job in .github/workflows/ci.yml
       topics          = ["nix-flakes", "code-review", "ai", "llm", "ollama", "forgejo", "rust", "svelte"]
-      extra_labels = {
-        # Created by Dependabot for its cargo and npm update PRs.
-        "rust"       = { color = "000000", description = "Pull requests that update rust code" }
-        "javascript" = { color = "168700", description = "Pull requests that update javascript code" }
-      }
     }
     "foyer" = {
       description     = "Next-generation lightweight homelab portal and service launchpad for the kleinbem fleet"
       required_checks = ["check"] # job in .github/workflows/ci.yml
       topics          = ["svelte", "sveltekit", "homelab", "dashboard", "nixos", "nix-flakes", "tailwind"]
-      extra_labels = {
-        # Created by Dependabot for its npm update PRs.
-        "javascript" = { color = "168700", description = "Pull requests that update javascript code" }
-      }
     }
     "attic-ui" = {
       description     = "Next-generation web interface and store inspector for Attic Nix binary cache"
       required_checks = ["check"] # job in .github/workflows/ci.yml
       topics          = ["svelte", "sveltekit", "attic", "nix", "nix-binary-cache", "nixos", "nix-flakes", "tailwind"]
-      extra_labels = {
-        # Created by Dependabot for its npm update PRs.
-        "javascript" = { color = "168700", description = "Pull requests that update javascript code" }
-      }
     }
   }
 
@@ -294,6 +259,13 @@ locals {
     "wontfix"          = { color = "ffffff", description = "This will not be worked on" }
     "security"         = { color = "ff0000", description = "Security vulnerability or enhancement" }
     "dependencies"     = { color = "0366d6", description = "Pull requests that update a dependency" }
+    # Dependabot adds one of these next to dependencies and creates it if it's
+    # missing; a label missing here makes the apply's delete gate stop it.
+    "github_actions" = { color = "000000", description = "Pull requests that update GitHub Actions code" }
+    "javascript"     = { color = "168700", description = "Pull requests that update javascript code" }
+    "rust"           = { color = "000000", description = "Pull requests that update rust code" }
+    "go"             = { color = "16e2e2", description = "Pull requests that update Go code" }
+    "docker"         = { color = "21ceff", description = "Pull requests that update Docker code" }
   }
 
 }
