@@ -67,8 +67,10 @@ locals {
       topics          = ["nixos", "nix-flakes", "infrastructure-as-code", "homelab", "monorepo", "jujutsu"]
     }
     "nix-config" = {
-      description     = "nix-config"
-      required_checks = ["check"]
+      description = "nix-config"
+      # Build: build-all.yaml's aggregate of the x86_64 + aarch64 builds; it
+      # reports on every PR (passes when a docs-only PR skips them).
+      required_checks = ["check", "Build"]
       topics          = ["nixos", "nix-flakes", "homelab", "home-manager", "nixos-config"]
       extra_labels = {
         # Filed by the daily Vaultwarden version-drift watcher.
