@@ -144,6 +144,11 @@ locals {
       coderabbit  = false
       topics      = ["mesh-llm", "github-actions", "ci", "cuda"]
     }
+    "hf-bench" = {
+      description     = "Edge & local LLM quantization, KL-divergence evaluation, and hardware power/throughput benchmarking for Hugging Face"
+      required_checks = ["check"] # job name in .github/workflows/ci.yaml
+      topics          = ["huggingface", "llama-cpp", "gguf", "quantization", "edge-ai", "jetson-orin-nano", "nixos", "sveltekit"]
+    }
     "chrome-open-in-app" = {
       description     = "Move browser tabs into standalone PWA/app windows (Chrome extension + Go native host)"
       required_checks = ["Lint, Test & Validate"] # job name in .github/workflows/ci.yaml
