@@ -114,6 +114,11 @@ locals {
       required_checks = ["check"]
       topics          = ["nixos", "nix-flakes", "templates", "scaffolding"]
     }
+    "nix-omarchy" = {
+      description     = "Opinionated Omarchy desktop vendored and rewired for NixOS"
+      required_checks = ["check"] # job name in .github/workflows/ci.yaml
+      topics          = ["nixos", "nix-flakes", "nixos-modules", "home-manager", "hyprland", "quickshell", "omarchy"]
+    }
     # CodeRabbit's free plan covers public repos only, so its check isn't
     # required here or on mesh-llm-gpu.
     "kleinbem-secrets" = {
