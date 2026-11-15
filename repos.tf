@@ -269,6 +269,8 @@ locals {
     "wontfix"          = { color = "ffffff", description = "This will not be worked on" }
     "security"         = { color = "ff0000", description = "Security vulnerability or enhancement" }
     "dependencies"     = { color = "0366d6", description = "Pull requests that update a dependency" }
+    # Excluded by kleinbem/coderabbit's auto_review.labels; agent-ops says when to use it.
+    "cr-skip" = { color = "bfdadc", description = "Small low-risk change: no CodeRabbit review" }
     # Dependabot adds one of these next to dependencies and creates it if it's
     # missing; a label missing here makes the apply's delete gate stop it.
     "github_actions" = { color = "000000", description = "Pull requests that update GitHub Actions code" }
