@@ -1,0 +1,320 @@
+{
+  "nix-config": {
+    "views": 48,
+    "unique_views": 40,
+    "clones": 23301,
+    "unique_clones": 1487
+  },
+  "nix-presets": {
+    "views": 27,
+    "unique_views": 23,
+    "clones": 4749,
+    "unique_clones": 511
+  },
+  "skills": {
+    "views": 25,
+    "unique_views": 14,
+    "clones": 2546,
+    "unique_clones": 403
+  },
+  "nix-detour-fleet": {
+    "views": 12,
+    "unique_views": 9,
+    "clones": 866,
+    "unique_clones": 373
+  },
+  "nix-packages": {
+    "views": 37,
+    "unique_views": 26,
+    "clones": 3381,
+    "unique_clones": 471
+  },
+  "nix-hardware": {
+    "views": 5,
+    "unique_views": 5,
+    "clones": 742,
+    "unique_clones": 202
+  },
+  "nix-templates": {
+    "views": 7,
+    "unique_views": 6,
+    "clones": 598,
+    "unique_clones": 189
+  },
+  "nix": {
+    "views": 26,
+    "unique_views": 18,
+    "clones": 3261,
+    "unique_clones": 404
+  },
+  "nixpkgs-review-gha": {
+    "views": 3,
+    "unique_views": 3,
+    "clones": 902,
+    "unique_clones": 28
+  },
+  "nix-toolbox": {
+    "views": 4,
+    "unique_views": 4,
+    "clones": 550,
+    "unique_clones": 127
+  },
+  "coderabbit": {
+    "views": 6,
+    "unique_views": 6,
+    "clones": 361,
+    "unique_clones": 126
+  },
+  "nix-devshells": {
+    "views": 8,
+    "unique_views": 7,
+    "clones": 1313,
+    "unique_clones": 264
+  },
+  "kleinbem": {
+    "views": 12,
+    "unique_views": 8,
+    "clones": 2727,
+    "unique_clones": 287
+  },
+  "github-config": {
+    "views": 18,
+    "unique_views": 16,
+    "clones": 1509,
+    "unique_clones": 291
+  },
+  "actions": {
+    "views": 9,
+    "unique_views": 9,
+    "clones": 1451,
+    "unique_clones": 217
+  },
+  "nix-omarchy": {
+    "views": 0,
+    "unique_views": 0,
+    "clones": 243,
+    "unique_clones": 74
+  },
+  "kleinbem-secrets": {
+    "views": 0,
+    "unique_views": 0,
+    "clones": 141,
+    "unique_clones": 3
+  },
+  "hf-bench": {
+    "views": 0,
+    "unique_views": 0,
+    "clones": 102,
+    "unique_clones": 32
+  },
+  "web-config": {
+    "views": 0,
+    "unique_views": 0,
+    "clones": 1475,
+    "unique_clones": 1006
+  },
+  "hype": {
+    "views": 0,
+    "unique_views": 0,
+    "clones": 0,
+    "unique_clones": 0
+  },
+  "Hyprland": {
+    "views": 0,
+    "unique_views": 0,
+    "clones": 7,
+    "unique_clones": 7
+  },
+  "omasnap": {
+    "views": 0,
+    "unique_views": 0,
+    "clones": 3,
+    "unique_clones": 3
+  },
+  "kleinbem-site": {
+    "views": 17,
+    "unique_views": 14,
+    "clones": 1021,
+    "unique_clones": 228
+  },
+  "amp-acp": {
+    "views": 0,
+    "unique_views": 0,
+    "clones": 4,
+    "unique_clones": 4
+  },
+  "nixos-hardware": {
+    "views": 0,
+    "unique_views": 0,
+    "clones": 4,
+    "unique_clones": 4
+  },
+  "omarchy-pkgs": {
+    "views": 0,
+    "unique_views": 0,
+    "clones": 29,
+    "unique_clones": 13
+  },
+  "nixpkgs": {
+    "views": 1,
+    "unique_views": 1,
+    "clones": 5184,
+    "unique_clones": 273
+  },
+  "aur-packages": {
+    "views": 5,
+    "unique_views": 5,
+    "clones": 389,
+    "unique_clones": 123
+  },
+  "openwrt": {
+    "views": 7,
+    "unique_views": 7,
+    "clones": 326,
+    "unique_clones": 98
+  },
+  "openwrt-config": {
+    "views": 16,
+    "unique_views": 15,
+    "clones": 834,
+    "unique_clones": 178
+  },
+  "openwrt-builder": {
+    "views": 8,
+    "unique_views": 8,
+    "clones": 451,
+    "unique_clones": 112
+  },
+  "mesh-llm-ci": {
+    "views": 3,
+    "unique_views": 2,
+    "clones": 588,
+    "unique_clones": 172
+  },
+  "aquamarine": {
+    "views": 0,
+    "unique_views": 0,
+    "clones": 5,
+    "unique_clones": 4
+  },
+  "mesh-llm-gpu": {
+    "views": 0,
+    "unique_views": 0,
+    "clones": 73,
+    "unique_clones": 3
+  },
+  "android-config": {
+    "views": 2,
+    "unique_views": 2,
+    "clones": 373,
+    "unique_clones": 120
+  },
+  "chrome-open-in-app": {
+    "views": 2,
+    "unique_views": 2,
+    "clones": 448,
+    "unique_clones": 123
+  },
+  "jj-toolbox": {
+    "views": 3,
+    "unique_views": 3,
+    "clones": 393,
+    "unique_clones": 111
+  },
+  "garage-ui": {
+    "views": 0,
+    "unique_views": 0,
+    "clones": 7,
+    "unique_clones": 6
+  },
+  "icamerasrc": {
+    "views": 1,
+    "unique_views": 1,
+    "clones": 5,
+    "unique_clones": 5
+  },
+  "ipu7-camera-hal": {
+    "views": 0,
+    "unique_views": 0,
+    "clones": 4,
+    "unique_clones": 4
+  },
+  "mesh-llm-python-sdk": {
+    "views": 0,
+    "unique_views": 0,
+    "clones": 3,
+    "unique_clones": 3
+  },
+  "hyprland-plugins": {
+    "views": 0,
+    "unique_views": 0,
+    "clones": 9,
+    "unique_clones": 8
+  },
+  "buzz-app": {
+    "views": 0,
+    "unique_views": 0,
+    "clones": 2559,
+    "unique_clones": 79
+  },
+  "rfc39-record": {
+    "views": 1,
+    "unique_views": 1,
+    "clones": 1,
+    "unique_clones": 1
+  },
+  "llama.cpp": {
+    "views": 0,
+    "unique_views": 0,
+    "clones": 9,
+    "unique_clones": 9
+  },
+  "goose": {
+    "views": 0,
+    "unique_views": 0,
+    "clones": 7,
+    "unique_clones": 7
+  },
+  "mesh-llm": {
+    "views": 2,
+    "unique_views": 2,
+    "clones": 1845,
+    "unique_clones": 232
+  },
+  "alsa-ucm-conf": {
+    "views": 0,
+    "unique_views": 0,
+    "clones": 10,
+    "unique_clones": 9
+  },
+  "buzz": {
+    "views": 1,
+    "unique_views": 1,
+    "clones": 155,
+    "unique_clones": 28
+  },
+  "gimp3-mcp": {
+    "views": 0,
+    "unique_views": 0,
+    "clones": 0,
+    "unique_clones": 0
+  },
+  "u-boot": {
+    "views": 0,
+    "unique_views": 0,
+    "clones": 6,
+    "unique_clones": 6
+  },
+  "asdcontrol": {
+    "views": 0,
+    "unique_views": 0,
+    "clones": 3,
+    "unique_clones": 3
+  },
+  "spark_hwmon": {
+    "views": 0,
+    "unique_views": 0,
+    "clones": 3,
+    "unique_clones": 3
+  }
+}
