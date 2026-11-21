@@ -271,6 +271,9 @@ locals {
     "dependencies"     = { color = "0366d6", description = "Pull requests that update a dependency" }
     # The only PRs kleinbem/coderabbit reviews; agent-ops says when to add it.
     "cr-review" = { color = "bfdadc", description = "Ask CodeRabbit to review this PR" }
+    # Set by coderabbit-steward: its review-only PRs and its findings issue.
+    "cr-proactive" = { color = "bfdadc", description = "Review-only PR opened to review existing code; never merged" }
+    "cr-findings"  = { color = "bfdadc", description = "Open CodeRabbit findings for this repo" }
     # Dependabot adds one of these next to dependencies and creates it if it's
     # missing; a label missing here makes the apply's delete gate stop it.
     "github_actions" = { color = "000000", description = "Pull requests that update GitHub Actions code" }
