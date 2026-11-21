@@ -149,6 +149,11 @@ locals {
       coderabbit  = false
       topics      = ["mesh-llm", "github-actions", "ci", "cuda"]
     }
+    "mesh-dev-plugin" = {
+      description     = "Zero-GPU developer & test plugin for Mesh-LLM: programmable fake OpenAI models, supervision fault injection, and live observation/exchange inspection"
+      required_checks = ["check"] # job in .github/workflows/ci.yml
+      topics          = ["mesh-llm", "rust", "nix-flakes", "testing", "security"]
+    }
     "hf-bench" = {
       description     = "Edge & local LLM quantization, KL-divergence evaluation, and hardware power/throughput benchmarking for Hugging Face"
       required_checks = ["check"] # job name in .github/workflows/ci.yaml
