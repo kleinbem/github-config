@@ -281,6 +281,7 @@ locals {
     "rust"           = { color = "000000", description = "Pull requests that update rust code" }
     "go"             = { color = "16e2e2", description = "Pull requests that update Go code" }
     "docker"         = { color = "21ceff", description = "Pull requests that update Docker code" }
+    "opentofu"       = { color = "f9db4e", description = "Pull requests that update opentofu code" }
   }
 
 }
