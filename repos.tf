@@ -154,6 +154,12 @@ locals {
       required_checks = ["check"] # job in .github/workflows/ci.yml
       topics          = ["mesh-llm", "rust", "nix-flakes", "testing", "security"]
     }
+    "layerstream-plugin" = {
+      description     = "Out-of-core GGUF layer-streaming inference engine and Mesh-LLM v3 plugin (zero-patch llama.cpp, CUDA/Vulkan/Metal, dense & sparse MoE)"
+      required_checks = ["check"] # job in .github/workflows/ci.yml
+      fleet_lint      = false     # no fleet-lint workflow yet
+      topics          = ["cuda", "edge-ai", "gguf", "jetson", "llama-cpp", "mesh-llm", "metal", "moe", "rust", "vulkan"]
+    }
     "hf-bench" = {
       description     = "Edge & local LLM quantization, KL-divergence evaluation, and hardware power/throughput benchmarking for Hugging Face"
       required_checks = ["check"] # job name in .github/workflows/ci.yaml
