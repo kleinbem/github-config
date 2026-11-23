@@ -255,6 +255,11 @@ locals {
       required_checks = ["check"] # job in .github/workflows/ci.yml
       topics          = ["svelte", "sveltekit", "attic", "nix", "nix-binary-cache", "nixos", "nix-flakes", "tailwind"]
     }
+    "coderabbit-steward" = {
+      description     = "Budget tracker, scheduler, coverage map, and findings steward for CodeRabbit OSS"
+      required_checks = ["check"] # job in .github/workflows/ci.yml
+      topics          = ["coderabbit", "rust", "svelte", "sveltekit", "nix-flakes", "github-app"]
+    }
   }
 
   org_repos = {
